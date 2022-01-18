@@ -271,6 +271,235 @@ var _hmt = _hmt || [];
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/18/python-locust%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%B0%83%E7%A0%94-%E5%9F%BA%E4%BA%8EHTTP%E5%8D%8F%E8%AE%AE/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2022/01/18/python-locust%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%B0%83%E7%A0%94-%E5%9F%BA%E4%BA%8EHTTP%E5%8D%8F%E8%AE%AE/" itemprop="url">
+                  python locust压测工具调研<基于HTTP协议>
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2022-01-18T15:50:22+08:00">
+                2022-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="1-简述"><a href="#1-简述" class="headerlink" title="1. 简述"></a>1. 简述</h2><p><code>locust</code>是基于python实现的<code>http协议</code>压测工具，有着以下特点:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 可编程: python编写压测用例</span><br><span class="line">2. 可视化: 提供简易的webui，展示压测结果和过程</span><br><span class="line">3. 可扩容: 支持分布式压测，提升`压力机`性能</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-1-使用"><a href="#1-1-使用" class="headerlink" title="1.1 使用"></a>1.1 使用</h3><p>压测时，经常需要用户指定<code>连接数</code>(或者<code>线程数</code>)， 然后对于每个<code>连接</code>, 发起一系列的请求；而<code>locust</code>使用<code>user</code>，表示<code>连接</code>.</p>
+<p>所以，locust的压测脚本的逻辑基本如下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">from locust import HttpUser, task</span><br><span class="line">from locust.contrib.fasthttp import FastHttpUser</span><br><span class="line"></span><br><span class="line">class HelloWorldUser(FastHttpUser):</span><br><span class="line">    @task</span><br><span class="line">    def hello_world(self):</span><br><span class="line">        self.client.get(&quot;/&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>启动的话:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">locust -f locustfile.py --headless --users 1000 --spawn-rate 10  -H http://10.90.230.18:10000</span><br><span class="line"></span><br><span class="line">其中:</span><br><span class="line">--headless: 表示不启动webui</span><br><span class="line">--users: 总虚拟用户数(总连接数)</span><br><span class="line">--spawn-rate: 每秒钟生成的虚拟用户数</span><br><span class="line">-H: 被压服务的地址</span><br></pre></td></tr></table></figure>
+
+
+<p><strong>注意</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">locust默认提供了两种user： HttpUser(基于requests), FastHttpUser(基于gevent + requests); </span><br><span class="line">后者的性能是前者的5-6倍。</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="2-性能评估"><a href="#2-性能评估" class="headerlink" title="2. 性能评估"></a>2. 性能评估</h2><p>下面，基于简单的压测，大致看看<code>locust</code>的压测性能, 同时使用<code>apache benchmark</code>工具进行压测，方便比较。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A机器： 部署被压测服务</span><br><span class="line">B机器:  分别使用ab和locust作为压测客户端,进行压测</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-1-被测试服务准备"><a href="#2-1-被测试服务准备" class="headerlink" title="2.1 被测试服务准备"></a>2.1 被测试服务准备</h3><p><code>A</code>机器上, 基于<code>gunicorn</code>启动一个<code>flask</code>服务<code>app.py</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def hello():</span><br><span class="line">    return &#x27;hello, world&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>启动命令:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gunicorn -b &#x27;0.0.0.0:10000&#x27; -w 8 -k gevent app:app</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-客户端脚本准备"><a href="#2-2-客户端脚本准备" class="headerlink" title="2.2 客户端脚本准备"></a>2.2 客户端脚本准备</h3><p>在<code>B</code>机器上，准备一个<code>locustfile.py</code>,  内容同<code>1.1 使用</code>.</p>
+<h3 id="2-3-standalone压测"><a href="#2-3-standalone压测" class="headerlink" title="2.3 standalone压测"></a>2.3 standalone压测</h3><h4 id="2-3-1-locust压测"><a href="#2-3-1-locust压测" class="headerlink" title="2.3.1 locust压测"></a>2.3.1 locust压测</h4><ol>
+<li>1000个用户</li>
+</ol>
+<p>命令: </p>
+<pre><code> `locust  --headless --users 1000 --spawn-rate 10  -H http://10.90.230.18:10000`
+</code></pre>
+<p>cpu使用率: </p>
+<pre><code>100%
+</code></pre>
+<p>gunicorn cpu使用率:</p>
+<pre><code>8个worker, cpu使用在 50%~60% 
+</code></pre>
+<p>qps:</p>
+<p><img src="/img/2022/01/18/locust_1000_rps.png" alt="rps"></p>
+<ol start="2">
+<li>2000个用户</li>
+</ol>
+<p>命令: </p>
+<pre><code> `locust  --headless --users 2000 --spawn-rate 10  -H http://10.90.230.18:10000`
+</code></pre>
+<p>cpu使用率: </p>
+<pre><code>100%
+</code></pre>
+<p>gunicorn cpu使用率:</p>
+<pre><code>8个worker, cpu使用在 55%~60%
+</code></pre>
+<p>qps:</p>
+<p><img src="/img/2022/01/18/locust_2000_rps.png" alt="rps"></p>
+<h4 id="2-3-2-apache-bench"><a href="#2-3-2-apache-bench" class="headerlink" title="2.3.2 apache bench"></a>2.3.2 apache bench</h4><ol>
+<li>1000个用户</li>
+</ol>
+<p>命令: </p>
+<pre><code> ab -n 1000000 -c 1000 &quot;http://10.90.230.18:10000/&quot;
+</code></pre>
+<p>cpu使用率: </p>
+<pre><code>52%
+</code></pre>
+<p>gunicorn cpu 使用率:</p>
+<pre><code>8个worker，均为99%左右
+</code></pre>
+<p>qps:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Server Software:        gunicorn</span><br><span class="line">Server Hostname:        10.90.230.18</span><br><span class="line">Server Port:            10000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        12 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      1000</span><br><span class="line">Time taken for tests:   82.130 seconds</span><br><span class="line">Complete requests:      1000000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      165000000 bytes</span><br><span class="line">HTML transferred:       12000000 bytes</span><br><span class="line">Requests per second:    12175.81 [#/sec] (mean)(**主要看这个**)</span><br><span class="line">Time per request:       82.130 [ms] (mean)</span><br><span class="line">Time per request:       0.082 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          1961.92 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        1    2   0.5      2      18</span><br><span class="line">Processing:     3   81   4.5     80     110</span><br><span class="line">Waiting:        3   80   4.5     80     110</span><br><span class="line">Total:         14   82   4.4     82     112</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%     82</span><br><span class="line">  66%     83</span><br><span class="line">  75%     85</span><br><span class="line">  80%     85</span><br><span class="line">  90%     88</span><br><span class="line">  95%     90</span><br><span class="line">  98%     92</span><br><span class="line">  99%     94</span><br><span class="line"> 100%    112 (longest request)</span><br></pre></td></tr></table></figure>
+
+
+<ol start="2">
+<li>2000个用户</li>
+</ol>
+<p>命令: </p>
+<pre><code> ab -n 1000000 -c 2000 &quot;http://10.90.230.18:10000/&quot;
+</code></pre>
+<p>cpu使用率: </p>
+<pre><code>55%
+</code></pre>
+<p>gunicorn cpu 使用率:</p>
+<pre><code>   8个worker，均为99%左右
+</code></pre>
+<p>qps:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">Server Software:        gunicorn</span><br><span class="line">Server Hostname:        10.90.230.18</span><br><span class="line">Server Port:            10000</span><br><span class="line"></span><br><span class="line">Document Path:          /</span><br><span class="line">Document Length:        12 bytes</span><br><span class="line"></span><br><span class="line">Concurrency Level:      2000</span><br><span class="line">Time taken for tests:   87.588 seconds</span><br><span class="line">Complete requests:      1000000</span><br><span class="line">Failed requests:        0</span><br><span class="line">Total transferred:      165000000 bytes</span><br><span class="line">HTML transferred:       12000000 bytes</span><br><span class="line">Requests per second:    11417.12 [#/sec] (mean)</span><br><span class="line">Time per request:       175.176 [ms] (mean)</span><br><span class="line">Time per request:       0.088 [ms] (mean, across all concurrent requests)</span><br><span class="line">Transfer rate:          1839.67 [Kbytes/sec] received</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+/-sd] median   max</span><br><span class="line">Connect:        1    2   0.9      2      29</span><br><span class="line">Processing:     8  173  15.0    170     246</span><br><span class="line">Waiting:        4  173  15.0    170     246</span><br><span class="line">Total:         27  175  14.8    172     247</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)</span><br><span class="line">  50%    172</span><br><span class="line">  66%    179</span><br><span class="line">  75%    183</span><br><span class="line">  80%    186</span><br><span class="line">  90%    194</span><br><span class="line">  95%    199</span><br><span class="line">  98%    217</span><br><span class="line">  99%    227</span><br><span class="line"> 100%    247 (longest request)</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="2-3-3-结论"><a href="#2-3-3-结论" class="headerlink" title="2.3.3 结论"></a>2.3.3 结论</h4><ol>
+<li>根据<code>ab</code>的测试情况来看，被测试服务的qps极限在<code>11000</code>左右。</li>
+<li><code>standalone</code>模式下,<code>locust</code>单进程发出的请求极限是<code>5000~6000</code>， 远达不到系统性能上限;  </li>
+</ol>
+<h3 id="2-4-分布式压测"><a href="#2-4-分布式压测" class="headerlink" title="2.4 分布式压测"></a>2.4 分布式压测</h3><p>得知系统的瓶颈后，只需要再查看<code>locust</code>的分布式压测使用即可。</p>
+<p>简单介绍下<code>locust</code>分布式压测的原理(jmeter类似):</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. master节点启动</span><br><span class="line">2. 多个worker启动，先后连上master节点</span><br><span class="line">3. master节点为连上的worker节点分配虚拟用户数量</span><br><span class="line">4. 各个worker开始分别进行压测，并把统计结果上报给master</span><br><span class="line">5. master节点汇总压测结果后，进行展示</span><br></pre></td></tr></table></figure>
+
+<p>这里，在同一台机器上，同时启动<code>一个master + 3个worker</code>,  启动顺序如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 启动master</span><br><span class="line">locust -f locustfile.py --master --headless --users 1000 --spawn-rate 10  -H http://10.90.230.18:10000</span><br><span class="line"></span><br><span class="line">locust -f locustfile.py --worker --master-host=127.0.0.1</span><br><span class="line">locust -f locustfile.py --worker --master-host=127.0.0.1</span><br><span class="line">locust -f locustfile.py --worker --master-host=127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p>测试期间,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">三个worker的cpu使用率： 91% ~ 99%</span><br><span class="line">gunicorn 8个worker使用率: 99%</span><br></pre></td></tr></table></figure>
+
+<p>qps结果如下:</p>
+<p><img src="/img/2022/01/18/locust_distributed_result.png" alt="locust_distributed_result"></p>
+<p><strong>结论如下</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1. 基于多进程的分布式压测，locust本身性能可以得到极大提升</span><br></pre></td></tr></table></figure>
+
+
+
+
+<h2 id="3-最终结论"><a href="#3-最终结论" class="headerlink" title="3. 最终结论"></a>3. 最终结论</h2><ol>
+<li>基于多进程的分布式压测，locust可以满足线上环境的压测需要</li>
+<li>locust本身还需要二次开发，才肯能满足业务需要, 比如：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1) 指定请求总数</span><br><span class="line">2) locust压测统计报表自定义</span><br></pre></td></tr></table></figure>
+
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
   <link itemprop="mainEntityOfPage" href="http://yoursite.com/2022/01/18/python-locust%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%B0%83%E7%A0%94-%E5%9F%BA%E4%BA%8EgRPC%E5%8D%8F%E8%AE%AE/">
 
   <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1509,147 +1738,6 @@ var _hmt = _hmt || [];
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/07/python-web%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93%E5%92%8C%E6%AF%94%E8%BE%83/">
-
-  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <meta itemprop="name" content="">
-    <meta itemprop="description" content="">
-    <meta itemprop="image" content="/images/avatar.gif">
-  </span>
-
-  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <meta itemprop="name" content="bingtel">
-    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
-      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
-    </span>
-  </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2019/10/07/python-web%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93%E5%92%8C%E6%AF%94%E8%BE%83/" itemprop="url">
-                  python web项目发布方式总结和比较
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-07T20:41:21+08:00">
-                2019-10-07
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index">
-                    <span itemprop="name">python</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Python Web项目，最终部署到生产环境上，有以下常用的三种方式：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A. 源码发布</span><br><span class="line">B. 压缩包方式</span><br><span class="line">C. 做成安装包，发布到(私有的)PYPI服务器，即：setup.py方式</span><br></pre></td></tr></table></figure>
-<p>下面对这三种方式进行总结和比较。</p>
-          <!--noindex-->
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2019/10/07/python-web%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93%E5%92%8C%E6%AF%94%E8%BE%83/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1695,7 +1783,7 @@ var _hmt = _hmt || [];
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">104</span>
+              <span class="site-state-item-count">105</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1712,7 +1800,7 @@ var _hmt = _hmt || [];
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">141</span>
+                <span class="site-state-item-count">142</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
