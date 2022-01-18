@@ -84,18 +84,18 @@
 
 
 
-<meta name="description" content="1. 简述locust是基于python实现的http协议压测工具，有着以下特点: 1231. 可编程: python编写压测用例2. 可视化: 提供简易的webui，展示压测结果和过程3. 可扩容: 支持分布式压测，提升&#96;压力机&#96;性能  1.1 使用压测时，经常需要用户指定连接数(或者线程数)， 然后对于每个连接, 发起一系列的请求；而locust使用user，表示连接. 所以，locust的压">
+<meta name="description" content="1. 简述locust是基于python实现的http协议压测工具，有着以下特点: 1231. 可编程: python编写压测用例2. 可视化: 提供简易的webui，展示压测结果和过程3. 可扩容: 支持分布式压测，提升&#96;压力机&#96;性能">
 <meta property="og:type" content="article">
 <meta property="og:title" content="python locust压测工具调研&lt;基于HTTP协议&gt;">
 <meta property="og:url" content="http://yoursite.com/2022/01/18/python-locust%E5%8E%8B%E6%B5%8B%E5%B7%A5%E5%85%B7%E8%B0%83%E7%A0%94-%E5%9F%BA%E4%BA%8EHTTP%E5%8D%8F%E8%AE%AE/index.html">
 <meta property="og:site_name" content="bingtel">
-<meta property="og:description" content="1. 简述locust是基于python实现的http协议压测工具，有着以下特点: 1231. 可编程: python编写压测用例2. 可视化: 提供简易的webui，展示压测结果和过程3. 可扩容: 支持分布式压测，提升&#96;压力机&#96;性能  1.1 使用压测时，经常需要用户指定连接数(或者线程数)， 然后对于每个连接, 发起一系列的请求；而locust使用user，表示连接. 所以，locust的压">
+<meta property="og:description" content="1. 简述locust是基于python实现的http协议压测工具，有着以下特点: 1231. 可编程: python编写压测用例2. 可视化: 提供简易的webui，展示压测结果和过程3. 可扩容: 支持分布式压测，提升&#96;压力机&#96;性能">
 <meta property="og:locale">
 <meta property="og:image" content="http://yoursite.com/img/2022/01/18/locust_1000_rps.png">
 <meta property="og:image" content="http://yoursite.com/img/2022/01/18/locust_2000_rps.png">
 <meta property="og:image" content="http://yoursite.com/img/2022/01/18/locust_distributed_result.png">
 <meta property="article:published_time" content="2022-01-18T07:50:22.000Z">
-<meta property="article:modified_time" content="2022-01-18T07:51:54.415Z">
+<meta property="article:modified_time" content="2022-01-18T07:54:27.330Z">
 <meta property="article:author" content="Wang Yibing">
 <meta property="article:tag" content="locust">
 <meta property="article:tag" content="http">
@@ -354,6 +354,8 @@ var _hmt = _hmt || [];
       
         <h2 id="1-简述"><a href="#1-简述" class="headerlink" title="1. 简述"></a>1. 简述</h2><p><code>locust</code>是基于python实现的<code>http协议</code>压测工具，有着以下特点:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 可编程: python编写压测用例</span><br><span class="line">2. 可视化: 提供简易的webui，展示压测结果和过程</span><br><span class="line">3. 可扩容: 支持分布式压测，提升`压力机`性能</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
 
 <h3 id="1-1-使用"><a href="#1-1-使用" class="headerlink" title="1.1 使用"></a>1.1 使用</h3><p>压测时，经常需要用户指定<code>连接数</code>(或者<code>线程数</code>)， 然后对于每个<code>连接</code>, 发起一系列的请求；而<code>locust</code>使用<code>user</code>，表示<code>连接</code>.</p>
 <p>所以，locust的压测脚本的逻辑基本如下。</p>
