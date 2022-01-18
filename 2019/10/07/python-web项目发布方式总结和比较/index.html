@@ -409,7 +409,7 @@ Welcome to pypiserver!<br>This is a PyPI compatible package index serving 0 pack
 <p>@app.route(‘/‘)<br>def hello():<br>    return ‘hello world’</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">`setup.py`内容如下：</span><br></pre></td></tr></table></figure>
 <h1 id="coding-utf-8"><a href="#coding-utf-8" class="headerlink" title="coding:utf-8"></a>coding:utf-8</h1><p>from setuptools import setup</p>
-<p>setup(<br>        name=’flask_helloworld’,     # 包名字<br>        version=’1.0’,   # 包版本<br>        description=’hello test with flask’,<br>        author=’let me go’,  # 作者<br>        author_email=‘<a href="mailto:&#108;&#101;&#116;&#x6d;&#x65;&#x67;&#x6f;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;">&#108;&#101;&#116;&#x6d;&#x65;&#x67;&#x6f;&#x40;&#x31;&#54;&#x33;&#x2e;&#99;&#111;&#109;</a>‘,<br>        url=’<a href="https://localhost:8080&#39;">https://localhost:8080&#39;</a>,<br>        packages=[‘flask_helloworld’],<br>        install_requires=[<br>            ‘Flask&gt;=1.0.2’,<br>        ]<br>)</p>
+<p>setup(<br>        name=’flask_helloworld’,     # 包名字<br>        version=’1.0’,   # 包版本<br>        description=’hello test with flask’,<br>        author=’let me go’,  # 作者<br>        author_email=‘<a href="mailto:&#x6c;&#101;&#x74;&#x6d;&#101;&#103;&#111;&#x40;&#49;&#54;&#51;&#46;&#99;&#111;&#109;">&#x6c;&#101;&#x74;&#x6d;&#101;&#103;&#111;&#x40;&#49;&#54;&#51;&#46;&#99;&#111;&#109;</a>‘,<br>        url=’<a href="https://localhost:8080&#39;">https://localhost:8080&#39;</a>,<br>        packages=[‘flask_helloworld’],<br>        install_requires=[<br>            ‘Flask&gt;=1.0.2’,<br>        ]<br>)</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">执行下面的命令，生成安装包：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 <p>python setup.py sdist   # 生成 .tar.gz，支持 pip</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">将`dist/flask_helloworld-1.0.tar.gz`上传（拷贝）到`pypiserver`的`pkgs`目录中。</span><br><span class="line"></span><br><span class="line">访问`http://localhost:8080/simple/flask-helloworld/`可以看到上传的包。</span><br><span class="line"></span><br><span class="line">### 3.3 线上发布</span><br><span class="line"></span><br><span class="line">在线上环境，执行：</span><br><span class="line"></span><br></pre></td></tr></table></figure>
@@ -541,7 +541,7 @@ Welcome to pypiserver!<br>This is a PyPI compatible package index serving 0 pack
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-count">104</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -549,7 +549,7 @@ Welcome to pypiserver!<br>This is a PyPI compatible package index serving 0 pack
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -558,7 +558,7 @@ Welcome to pypiserver!<br>This is a PyPI compatible package index serving 0 pack
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-count">141</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
