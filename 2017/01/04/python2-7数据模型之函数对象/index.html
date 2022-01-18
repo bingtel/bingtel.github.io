@@ -1,0 +1,702 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="python,data model,函数对象," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="函数对象是Python语言中的一级公民，具有一些特殊属性，包括： __doc__ (可通过赋值修改) __name__ (可通过赋值修改) __module__ (可通过赋值修改) __defaults__ (可通过赋值修改) __code__ (可通过赋值修改) __globals__ (只读) __dict__ (可通过赋值修改) __closure__  (只读)  下面举个例子分别介绍一些">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python2.7数据模型之函数对象">
+<meta property="og:url" content="http://yoursite.com/2017/01/04/python2-7%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="函数对象是Python语言中的一级公民，具有一些特殊属性，包括： __doc__ (可通过赋值修改) __name__ (可通过赋值修改) __module__ (可通过赋值修改) __defaults__ (可通过赋值修改) __code__ (可通过赋值修改) __globals__ (只读) __dict__ (可通过赋值修改) __closure__  (只读)  下面举个例子分别介绍一些">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-01-03T23:35:30.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.909Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="data model">
+<meta property="article:tag" content="函数对象">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/04/python2-7数据模型之函数对象/"/>
+
+
+
+
+
+  <title> python2.7数据模型之函数对象 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/04/python2-7%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                python2.7数据模型之函数对象
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-04T07:35:30+08:00">
+                2017-01-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>函数对象是Python语言中的一级公民，具有一些特殊属性，包括：</p>
+<pre><code>__doc__ (可通过赋值修改)
+__name__ (可通过赋值修改)
+__module__ (可通过赋值修改)
+__defaults__ (可通过赋值修改)
+__code__ (可通过赋值修改)
+__globals__ (只读)
+__dict__ (可通过赋值修改)
+__closure__  (只读)
+</code></pre>
+<p>下面举个例子分别介绍一些。</p>
+<span id="more"></span>
+
+<p>首先，定义一个函数(装饰器)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def log(fn):</span><br><span class="line">    &quot;&quot;&quot;log装饰器</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    def wrapper(*args, **kwds):</span><br><span class="line">        print &#x27;begin&#x27;</span><br><span class="line">        ret = fn(*args, **kwds)</span><br><span class="line">        print &#x27;done&#x27;</span><br><span class="line">        return ret</span><br><span class="line">    return wrapper</span><br></pre></td></tr></table></figure>
+<p>那么，</p>
+<p><code>__name__</code>返回函数的名称：</p>
+<pre><code>&gt;&gt;&gt; log.__name__
+&#39;log&#39;
+</code></pre>
+<p><code>__doc__</code>返回函数的注释:</p>
+<pre><code>&gt;&gt;&gt; log.__doc__
+&#39;log\xe8\xa3\x85\xe9\xa5\xb0\xe5\x99\xa8\n    &#39;
+&gt;&gt;&gt; print log.__doc__
+log装饰器
+</code></pre>
+<p><code>__module__</code>返回函数所在的模块：</p>
+<pre><code>&gt;&gt;&gt; log.__module__
+&#39;__main__&#39;
+</code></pre>
+<p><code>__defaults__</code>返回函数参数的默认值(<strong>如果参数中包含关键字参数，则返回一个tuple, 每个元素的是参数的默认值；否则，返回None</strong>)：</p>
+<pre><code>&gt;&gt;&gt; log.__defaults__
+</code></pre>
+<p><code>__code__</code>返回函数的代码对象：</p>
+<pre><code>&gt;&gt;&gt; log.__code__
+&lt;code object log at 0x7fbdd326d130, file &quot;&lt;stdin&gt;&quot;, line 1&gt;
+</code></pre>
+<p><code>globals</code>指向了包含函数全局变量的字典：</p>
+<pre><code>&#123;&#39;__builtins__&#39;: &lt;module &#39;__builtin__&#39; (built-in)&gt;, 
+ &#39;__name__&#39;: &#39;__main__&#39;,
+ &#39;log&#39;: &lt;function log at 0x7fbdd3281668&gt;,
+ &#39;__doc__&#39;: None, &#39;__package__&#39;: None&#125;
+ 
+</code></pre>
+<p><code>__dict__</code>返回一个包含函数对象属性的字典：</p>
+<pre><code>&gt;&gt;&gt; log.__dict__
+&#123;&#125;
+&gt;&gt;&gt; log.a=1
+&gt;&gt;&gt; log.__dict__
+&#123;&#39;a&#39;: 1&#125;
+</code></pre>
+<p><code>__closure__</code>返回None或者一个包含闭包函数的tuple：</p>
+<pre><code>&gt;&gt;&gt; log.__closure__
+&gt;&gt;&gt; def f():
+...     print &#39;f() called&#39;
+... 
+&gt;&gt;&gt; t=log(f)
+&gt;&gt;&gt; t()
+begin
+f() called
+done
+&gt;&gt;&gt; t.__closure__
+(&lt;cell at 0x7fbdd32874b0: function object at 0x7fbdd32815f0&gt;,)
+</code></pre>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/data-model/" rel="tag"># data model</a>
+          
+            <a href="/tags/%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1/" rel="tag"># 函数对象</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/27/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E4%B8%8Eblinker%E4%BF%A1%E5%8F%B7%E9%87%8F/" rel="next" title="观察者模式与blinker信号量">
+                <i class="fa fa-chevron-left"></i> 观察者模式与blinker信号量
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/05/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E4%BA%8C-%E2%80%94%E2%80%94gunicorn%E7%9A%84%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E4%BB%A5%E5%8F%8A%E5%AF%B9%E5%B7%A5%E4%BD%9C%E8%80%85%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%AE%A1%E7%90%86/" rel="prev" title="Gunicorn源码阅读与分析(二)——gunicorn的信号处理以及对工作者进程的管理">
+                Gunicorn源码阅读与分析(二)——gunicorn的信号处理以及对工作者进程的管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

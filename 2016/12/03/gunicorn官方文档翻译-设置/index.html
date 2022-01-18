@@ -1,0 +1,1556 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn官方文档,gunicorn设置," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Settings(设置)This is an exhaustive list of settings for Gunicorn. Some settings are only able to be set from a configuration file. The setting name is what should be used in the configuration file. The">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gunicorn官方文档翻译-设置">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%AE%BE%E7%BD%AE/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Settings(设置)This is an exhaustive list of settings for Gunicorn. Some settings are only able to be set from a configuration file. The setting name is what should be used in the configuration file. The">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:25:26.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.656Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn官方文档">
+<meta property="article:tag" content="gunicorn设置">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/gunicorn官方文档翻译-设置/"/>
+
+
+
+
+
+  <title> gunicorn官方文档翻译-设置 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%AE%BE%E7%BD%AE/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                gunicorn官方文档翻译-设置
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:25:26+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gunicorn/" itemprop="url" rel="index">
+                    <span itemprop="name">gunicorn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Settings-设置"><a href="#Settings-设置" class="headerlink" title="Settings(设置)"></a>Settings(设置)</h1><p>This is an exhaustive list of settings for Gunicorn. Some settings are only able to be set from a configuration file. The setting name is what should be used in the configuration file. The command line arguments are listed as well for reference on setting at the command line.</p>
+<p>这是一份费神的Gunicorn的设置列表。有些设置只能从配置文件中设置。设置项名称指的是应该在配置文件中使用的东西。为了以供参考，命令行参数也列出了。</p>
+<span id="more"></span>
+
+<h3 id="Config-File-配置文件"><a href="#Config-File-配置文件" class="headerlink" title="Config File(配置文件)"></a>Config File(配置文件)</h3><h4 id="config"><a href="#config" class="headerlink" title="config"></a>config</h4><ul>
+<li>  <code>-c CONFIG, --config CONFIG</code></li>
+<li>  <code>None</code></li>
+</ul>
+<p>The Gunicorn config file.</p>
+<p>Gunicorn的配置文件。</p>
+<p>A string of the form PATH, file:PATH, or python:MODULE_NAME.</p>
+<p><code>PATH</code>、<code>file:PATH</code>、<code>python:MODULE_NAME</code>的字符串形式。</p>
+<p>Only has an effect when specified on the command line or as part of an application specific configuration.</p>
+<p>只有当命令行中指定或者应用的配置中指定时，才会起作用。</p>
+<p>Changed in version 19.4: Loading the config from a Python module requires the python: prefix.</p>
+<p>19.4中，做出了改变：从Python模块中加载配置时，要求<code>python:</code>作为前缀</p>
+<h3 id="Server-Socket"><a href="#Server-Socket" class="headerlink" title="Server Socket"></a>Server Socket</h3><h4 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h4><ul>
+<li><p>  <code>-b ADDRESS, --bind ADDRESS</code></p>
+</li>
+<li><p>  <code>[&#39;127.0.0.1:8000&#39;]</code></p>
+</li>
+</ul>
+<p>The socket to bind.</p>
+<p>需要绑定的套接字。</p>
+<p>A string of the form: HOST, HOST:PORT, unix:PATH. An IP is a valid HOST.</p>
+<p><code>HOST</code>、<code>HOST:PORT</code>、<code>unix:PATH</code>的字符串形式。IP是有效的<code>HOST</code>。</p>
+<p>Multiple addresses can be bound. ex.:</p>
+<p>可以绑定多个地址， 例如：</p>
+<pre><code>$ gunicorn -b 127.0.0.1:8000 -b [::1]:8000 test:app 
+</code></pre>
+<p>will bind the test:app application on localhost both on ipv6 and ipv4 interfaces.</p>
+<p>会把绑定<code>test:app</code>绑定到localhost的ipv4和ipv6的网口。</p>
+<h4 id="backlog"><a href="#backlog" class="headerlink" title="backlog"></a>backlog</h4><ul>
+<li><p>  <code>--backlog INT</code></p>
+</li>
+<li><p>  <code>2048</code></p>
+</li>
+</ul>
+<p>The maximum number of pending connections.</p>
+<p>最大连接数。</p>
+<p>This refers to the number of clients that can be waiting to be served. Exceeding this number results in the client getting an error when attempting to connect. It should only affect servers under significant load.</p>
+<p>该参数表示等待被服务的客户端的上限。超过此数目时， 尝试连接服务器的客户端会得到一个错误提示。在负载较高时， 该参数才会影响服务器。</p>
+<p>Must be a positive integer. Generally set in the 64-2048 range.</p>
+<p>必须是正整数， 通常介于64-2048之间。</p>
+<h4 id="Worker-Processes"><a href="#Worker-Processes" class="headerlink" title="Worker Processes"></a>Worker Processes</h4><p><em>workers</em></p>
+<ul>
+<li><p>  <code>-w INT, --workers INT</code></p>
+</li>
+<li><p>  <code>1</code></p>
+</li>
+</ul>
+<p>The number of worker processes for handling requests.</p>
+<p>用于处理请求的工作者进程数量。</p>
+<p>A positive integer generally in the 2-4 x $(NUM_CORES) range. You’ll want to vary this a bit to find the best for your particular application’s work load.</p>
+<p>一个通常介于<code>CPU核数的2-4倍</code>的正整数。你可以通过微调次参数来获取最适合你应用的值。</p>
+<p>By default, the value of the <code>WEB_CONCURRENCY</code> environment variable. If it is not defined, the default is <code>1</code>.</p>
+<p>缺省情况下， 由<code>WEB_CONCURRENCY</code>环境变量指定。否则， 默认值是<code>1</code>.</p>
+<p><em>worker_class</em></p>
+<ul>
+<li><p>  <code>-k STRING, --worker-class STRING</code></p>
+</li>
+<li><p>  <code>sync</code></p>
+</li>
+</ul>
+<p>The type of workers to use.</p>
+<p>要使用的工作者的类型。</p>
+<p>The default class (<code>sync</code>) should handle most “normal” types of workloads. You’ll want to read Design for information on when you might want to choose one of the other worker classes.</p>
+<p>默认的类(<code>sync</code>)能够处理大多数的请求负载。如果你想选择其他的工作类， 你应该读一下<a target="_blank" rel="noopener" href="http://docs.gunicorn.org/en/latest/design.html">Design</a>来获取更多的信息</p>
+<p>A string referring to one of the following bundled classes:</p>
+<p>工作类的集合如下：</p>
+<ul>
+<li>  <code>sync</code></li>
+<li>  <code>eventlet</code> - Requires eventlet &gt;= 0.9.7</li>
+<li>  <code>gevent</code> - Requires gevent &gt;= 0.13</li>
+<li>  <code>tornado</code> - Requires tornado &gt;= 0.2</li>
+<li>  <code>gthread</code> - Python 2 requires the futures package to be installed</li>
+<li>  <code>gaiohttp</code> - Requires Python 3.4 and aiohttp &gt;= 0.21.5</li>
+</ul>
+<p>Optionally, you can provide your own worker by giving Gunicorn a Python path to a subclass of <code>gunicorn.workers.base.Worker</code>. This alternative syntax will load the gevent class: <code>gunicorn.workers.ggevent.GeventWorker</code>. Alternatively, the syntax can also load the gevent class with <code>egg:gunicorn#gevent</code>.</p>
+<p>作为可选项，你可以通过告知Gunicorn<code>gunicorn.workers.base.Worker</code>的一个子类的路径来使用你自己的worker。这个替换的语法会加载gevent类：<code>gunicorn.workers.ggevent.GeventWorker</code>。也可以通过加载gevent类<code>egg:gunicorn#gevent</code>作为替代。</p>
+<p><em>threads</em></p>
+<ul>
+<li><p>  <code>--threads INT</code></p>
+</li>
+<li><p>  <code>1</code></p>
+</li>
+</ul>
+<p>The number of worker threads for handling requests.</p>
+<p>处理请求的工作线程数。</p>
+<p>Run each worker with the specified number of threads.</p>
+<p>为每个工作者进程指定的线程数。</p>
+<p>A positive integer generally in the <code>2-4 x $(NUM_CORES)</code> range. You’ll want to vary this a bit to find the best for your particular application’s work load.</p>
+<p>一个介于<code>CPU核数的2-4倍</code>的正整数。可以通过微调该参数，来获取最适合自身应用的值。</p>
+<p>If it is not defined, the default is 1.</p>
+<p>默认是1.</p>
+<p><em>worker_connections</em></p>
+<ul>
+<li><p>  <code>--worker-connections INT</code></p>
+</li>
+<li><p>  <code>1000</code></p>
+</li>
+</ul>
+<p>The maximum number of simultaneous clients.</p>
+<p>同时连接的客户端数目上限。</p>
+<p>This setting only affects the Eventlet and Gevent worker types.</p>
+<p>该配置只会影响Eventlet、Gevent工作者类型。</p>
+<p><em>max_requests</em></p>
+<ul>
+<li>  <code>--max-requests INT</code></li>
+<li>  <code>0</code></li>
+</ul>
+<p>The maximum number of requests a worker will process before restarting.</p>
+<p>在重启前， 一个工作者进程能够处理的最大请求数。</p>
+<p>Any value greater than zero will limit the number of requests a work will process before automatically restarting. This is a simple method to help limit the damage of memory leaks.</p>
+<p>一个大于0的值，将会限制一个工作者进程在重启前能够处理的请求数。这是一种减少内存泄漏的简单方法。</p>
+<p>If this is set to zero (the default) then the automatic worker restarts are disabled.</p>
+<p>如果该值是0(默认值)， 那么工作者进程不会默认重启。</p>
+<p><em>max_requests_jitter</em></p>
+<ul>
+<li><p>  <code>--max-requests-jitter INT</code></p>
+</li>
+<li><p>  <code>0</code></p>
+</li>
+</ul>
+<p>The maximum jitter to add to the max_requests setting.</p>
+<p>The jitter causes the restart per worker to be randomized by randint(0, max_requests_jitter). This is intended to stagger worker restarts to avoid all workers restarting at the same time.</p>
+<p>New in version 19.2.</p>
+<p><em>timeout</em></p>
+<ul>
+<li><p>  <code>-t INT, --timeout INT</code></p>
+</li>
+<li><p>  <code>30</code></p>
+</li>
+</ul>
+<p>Workers silent for more than this many seconds are killed and restarted.</p>
+<p>工作者进程静默时间超过该时间， 会被杀死并重启。</p>
+<p>Generally set to thirty seconds. Only set this noticeably higher if you’re sure of the repercussions for sync workers. For the non sync workers it just means that the worker process is still communicating and is not tied to the length of time required to handle a single request.</p>
+<p>通常该值设为30秒。只有当你明白为sync工作者进程设置该值的后果时，才能设置该值。对于非sync工作者进程， 该参数仅意味着进程还在通信，而非限制处理单个请求的时间。</p>
+<p><em>graceful_timeout</em></p>
+<ul>
+<li><p>  <code>--graceful-timeout INT</code></p>
+</li>
+<li><p>  <code>30</code></p>
+</li>
+</ul>
+<p>Timeout for graceful workers restart.</p>
+<p>工作者重启的超时时间。</p>
+<p>After receiving a restart signal, workers have this much time to finish serving requests. Workers still alive after the timeout (starting from the receipt of the restart signal) are force killed.</p>
+<p>收到该信号后， 工作者还剩余这么多的时间来处理请求。 超过该时间后， 工作者进程会被强制杀死。</p>
+<p><em>keepalive</em></p>
+<ul>
+<li><p>  <code>--keep-alive INT</code></p>
+</li>
+<li><p>  <code>2</code></p>
+</li>
+</ul>
+<p>The number of seconds to wait for requests on a Keep-Alive connection.</p>
+<p>在一个设置了<code>Keep-Alive</code>的连接上， 等待一个请求的秒数。</p>
+<p>Generally set in the 1-5 seconds range.</p>
+<p>通常介于<code>1-5</code>秒之间。</p>
+<h3 id="Security"><a href="#Security" class="headerlink" title="Security"></a>Security</h3><p><em>limit_request_line</em></p>
+<ul>
+<li><p>  <code>--limit-request-line INT</code></p>
+</li>
+<li><p>  <code>4094</code></p>
+</li>
+</ul>
+<p>The maximum size of HTTP request line in bytes.</p>
+<p>HTTP请求的最大字节数。</p>
+<p>This parameter is used to limit the allowed size of a client’s HTTP request-line. Since the request-line consists of the HTTP method, URI, and protocol version, this directive places a restriction on the length of a request-URI allowed for a request on the server. A server needs this value to be large enough to hold any of its resource names, including any information that might be passed in the query part of a GET request. Value is a number from 0 (unlimited) to 8190.</p>
+<p>该参数用于限制客户端的HTTP请求行数。由于请求包含HTPP方法、URI、协议版本等，这个指令对服务器上的request-URI的长度做出了限制。服务器需要该值足够大，这样它能够容纳所有的资源名， 包括GET请求的所有能够解析的部分， 该值介于0-8199， 0表示不限制大小.</p>
+<p>This parameter can be used to prevent any DDOS attack.</p>
+<p>该值可用于阻止DDOS攻击。</p>
+<p><em>limit_request_fields</em></p>
+<ul>
+<li><p>  <code>--limit-request-fields INT</code></p>
+</li>
+<li><p>  <code>100</code></p>
+</li>
+</ul>
+<p>Limit the number of HTTP headers fields in a request.</p>
+<p>限制一个请求头的字段的个数。</p>
+<p>This parameter is used to limit the number of headers in a request to prevent DDOS attack. Used with the limit_request_field_size it allows more safety. By default this value is 100 and can’t be larger than 32768.</p>
+<p>该参数通过限制headers的个数来阻止DDOS攻击。和<code>limit_request_field_size</code>搭配使用， 更安全。 默认情况下， 该值是100， 单不能超过32768。</p>
+<p><em>limit_request_field_size</em></p>
+<ul>
+<li><p>  <code>--limit-request-field_size INT</code></p>
+</li>
+<li><p>  <code>8190</code></p>
+</li>
+</ul>
+<p>Limit the allowed size of an HTTP request header field.</p>
+<p>限制HTTP请求头域的大小。</p>
+<p>Value is a positive number or 0. Setting it to 0 will allow unlimited header field sizes.</p>
+<p>是大于0的正整数。设为0， 表示不限制。</p>
+<p>** Warning**</p>
+<pre><code> Setting this parameter to a very high or unlimited value can open up for DDOS attacks.
+ 该值设置的太大或不限制， 可能会引起DDOS攻击。
+</code></pre>
+<h3 id="Debugging"><a href="#Debugging" class="headerlink" title="Debugging"></a>Debugging</h3><p><em>reload</em></p>
+<ul>
+<li><p>  <code>--reload</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Restart workers when code changes.</p>
+<p>当代码变化时， 重启工作者进程。</p>
+<p>This setting is intended for development. It will cause workers to be restarted whenever application code changes.</p>
+<p>该参数是为了开发时使用。只要代码变化， 工作者就会重启。</p>
+<p>The reloader is incompatible with application preloading. When using a paste configuration be sure that the server block does not import any application code or the reload will not work as designed.</p>
+<p>重载机制和应用的预加载机制不兼容。当使用Paste应用配置时， 请确保服务器没有导入任何的应用代码， 否则重载会出错。</p>
+<ul>
+<li><p>  spew*</p>
+</li>
+<li><p>  <code>--spew</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Install a trace function that spews every line executed by the server.</p>
+<p>安装一个跟踪函数， 告知(用户)服务器执行的每一行代码。</p>
+<p>This is the nuclear option.</p>
+<p>这是终极选项。</p>
+<p><em>check_config</em></p>
+<ul>
+<li><p>  <code>--check-config</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Check the configuration.</p>
+<p>检查配置是否正确。</p>
+<h3 id="Server-Mechanics"><a href="#Server-Mechanics" class="headerlink" title="Server Mechanics"></a>Server Mechanics</h3><p><em>preload_app</em></p>
+<ul>
+<li><p>  <code>--preload</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Load application code before the worker processes are forked.</p>
+<p>在工作者进程被fork出之前， 加载应用代码。</p>
+<p>By preloading an application you can save some RAM resources as well as speed up server boot times. Although, if you defer application loading to each worker process, you can reload your application code easily by restarting workers.</p>
+<p>通过预加载一个应用， 可以节省内存资源、加速服务器启动。然而， 如果将应用的加载延迟到每个工作者进程的创建， 你可以容易的通过重启工作者来重新加载应用。</p>
+<p><em>sendfile</em></p>
+<ul>
+<li><p>  <code>--no-sendfile</code></p>
+</li>
+<li><p>  <code>None</code></p>
+</li>
+</ul>
+<p>Disables the use of sendfile().</p>
+<p>禁用<code>sendfile()</code>。</p>
+<p>If not set, the value of the SENDFILE environment variable is used to enable or disable its usage.</p>
+<p>如果没有设置， 那么环境变量<code>SENDFILE</code>将决定是否启用该参数。</p>
+<p>New in version 19.2.</p>
+<p>在19.2.中新增的。</p>
+<p>Changed in version 19.4: Swapped –sendfile with –no-sendfile to actually allow disabling.</p>
+<p>19.4中发生的更改： 使用<code>--no-sendfile</code>替换<code>--sendfile</code>表示禁用。</p>
+<p>Changed in version 19.6: added support for the SENDFILE environment variable</p>
+<p>19.6中发生的更改： 增加环境变量<code>SENDFILE</code>的支持。</p>
+<p><em>chdir</em></p>
+<ul>
+<li><p>  <code>--chdir</code></p>
+</li>
+<li><p>  <code>/home/docs/checkouts/readthedocs.org/user_builds/gunicorn-docs/checkouts/latest/docs/source</code></p>
+</li>
+</ul>
+<p>Chdir to specified directory before apps loading.</p>
+<p>在应用加载前， 将目录切换到指定的路径。</p>
+<p><em>daemon</em></p>
+<ul>
+<li><p>  <code>-D, --daemon</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Daemonize the Gunicorn process.</p>
+<p>后台运行。</p>
+<p>Detaches the server from the controlling terminal and enters the background.</p>
+<p>将服务器进程和控制窗口分离，后台运行。</p>
+<p><em>raw_env</em></p>
+<ul>
+<li><p>  <code>-e ENV, --env ENV</code></p>
+</li>
+<li><p>  <code>[]</code></p>
+</li>
+</ul>
+<p>Set environment variable (key=value).</p>
+<p>设置环境变量。</p>
+<p>Pass variables to the execution environment. Ex.:</p>
+<p>将变量传给执行环境， 如：</p>
+<pre><code>$ gunicorn -b 127.0.0.1:8000 --env FOO=1 test:app
+</code></pre>
+<p>and test for the foo variable environment in your application.</p>
+<p>在你的应用中， 测试一下FOO变量。</p>
+<p><em>pidfile</em></p>
+<ul>
+<li><p>  <code>-p FILE, --pid FILE</code></p>
+</li>
+<li><p>  <code>None</code></p>
+</li>
+</ul>
+<p>A filename to use for the PID file.</p>
+<p>PID文件的文件名。</p>
+<p>If not set, no PID file will be written.</p>
+<p>不指定的话， 不会产生PID文件。</p>
+<p><em>worker_tmp_dir</em></p>
+<ul>
+<li><p>  <code>--worker-tmp-dir DIR</code></p>
+</li>
+<li><p>  <code>None</code></p>
+</li>
+</ul>
+<p>A directory to use for the worker heartbeat temporary file.</p>
+<p>存放工作者心跳临时文件的目录。</p>
+<p>If not set, the default temporary directory will be used.</p>
+<p>不指定的话， 会使用默认的临时目录。</p>
+<p><em>user</em></p>
+<ul>
+<li><p>  <code>-u USER, --user USER</code></p>
+</li>
+<li><p>  <code>1005</code></p>
+</li>
+</ul>
+<p>Switch worker processes to run as this user.</p>
+<p>将工作者进程所属的用户切换。</p>
+<p>A valid user id (as an integer) or the name of a user that can be retrieved with a call to pwd.getpwnam(value) or None to not change the worker process user.</p>
+<p>(需要是)有效的用户id或者是能够通过<code>pwd.getpwnam(value)</code>获取用户的用户名，None表示不切换。</p>
+<p><em>group</em></p>
+<ul>
+<li><p>  <code>-g GROUP, --group GROUP</code></p>
+</li>
+<li><p>  <code>205</code></p>
+</li>
+</ul>
+<p>Switch worker process to run as this group.</p>
+<p>将工作者进程所属的用户组切换。</p>
+<p>A valid group id (as an integer) or the name of a user that can be retrieved with a call to pwd.getgrnam(value) or None to not change the worker processes group.</p>
+<p>(需要是)有效的用户组id或者是能够通过<code>pwd.getgrnam(value)</code>获取用户组的用户组名称，None表示不切换。</p>
+<p><em>umask</em></p>
+<ul>
+<li><p>  <code>-m INT, --umask INT</code></p>
+</li>
+<li><p>  <code>0</code></p>
+</li>
+</ul>
+<p>A bit mask for the file mode on files written by Gunicorn.</p>
+<p>一个控制Gunicorn产生的文件模式的位掩码。</p>
+<p>Note that this affects unix socket permissions.</p>
+<p>注意： 这会影响unix套接字的权限。</p>
+<p>A valid value for the os.umask(mode) call or a string compatible with int(value, 0) (0 means Python guesses the base, so values like 0, 0xFF, 0022 are valid for decimal, hex, and octal representations)</p>
+<p>该值需要对<code>os.umask(mode)</code>有效， 或者兼容<code>int(value, 0)</code>(0表示基)函数。</p>
+<p><em>initgroups</em></p>
+<ul>
+<li><p>  <code>--initgroups</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>If true, set the worker process’s group access list with all of the groups of which the specified username is a member, plus the specified group id.</p>
+<p>该参数如果是<code>true</code>，设置工作进程的组访问列表中的所有组指定的用户名是一个成员，加上指定的组编号。</p>
+<p>New in version 19.7.</p>
+<p>19.7版本中新增加。</p>
+<p><em>tmp_upload_dir</em></p>
+<ul>
+<li>  <code>None</code></li>
+</ul>
+<p>Directory to store temporary request data as they are read.</p>
+<p>当请求数据被读取时， 临时存储这些数据的目录。</p>
+<p>This may disappear in the near future.</p>
+<p>不久的将来会出现。</p>
+<p>This path should be writable by the process permissions set for Gunicorn workers. If not specified, Gunicorn will choose a system generated temporary directory.</p>
+<p>该路径必须是Gunicorn工作者进程可写的。如果没有指定， Gunicorn会选择一个系统生成的临时目录。</p>
+<p><em>secure_scheme_headers</em></p>
+<ul>
+<li>  <code>&#123;&#39;X-FORWARDED-PROTOCOL&#39;: &#39;ssl&#39;, &#39;X-FORWARDED-PROTO&#39;: &#39;https&#39;, &#39;X-FORWARDED-SSL&#39;: &#39;on&#39;&#125;</code></li>
+</ul>
+<p>A dictionary containing headers and values that the front-end proxy uses to indicate HTTPS requests. These tell Gunicorn to set wsgi.url_scheme to https, so your application can tell that the request is secure.</p>
+<p>一个供前端代理用来表明HTTPS请求、存储请求头和对应值的字典。这些参数会告知Gunicorn把<code>wsgi.url_scheme</code>设置成<code>https</code>， 所以你的应用能够识别请求是安全的。</p>
+<p>The dictionary should map upper-case header names to exact string values. The value comparisons are case-sensitive, unlike the header names, so make sure they’re exactly what your front-end proxy sends when handling HTTPS requests.</p>
+<p>这个地点需要把大写的头域名映射到准确的字符串值。值的比较是大小写无关的， 不像头名称， 所以请确保你的前端代理在处理https请求时，传递了准确的值。</p>
+<p>It is important that your front-end proxy configuration ensures that the headers defined here can not be passed directly from the client.</p>
+<p>很重要： 你的前端代理不能把这里定义的headers传给客户端</p>
+<p><em>forwarded_allow_ips</em></p>
+<ul>
+<li><p>  <code>--forwarded-allow-ips STRING</code></p>
+</li>
+<li><p>  <code>127.0.0.1</code></p>
+</li>
+</ul>
+<p>Front-end’s IPs from which allowed to handle set secure headers. (comma separate).</p>
+<p>来源于这些IP的前端IP被允许处理设置安全的请求头（逗号分隔）。</p>
+<p>Set to * to disable checking of Front-end IPs (useful for setups where you don’t know in advance the IP address of Front-end, but you still trust the environment).</p>
+<p>该参数被设置成 <code>*</code>时， 不允许检查前端的IP。</p>
+<p>By default, the value of the FORWARDED_ALLOW_IPS environment variable. If it is not defined, the default is “127.0.0.1”.</p>
+<p>默认使用<code>FORWARDED_ALLOW_IPS</code>环境变量。 如果该环境变量没有被定义， 默认是 <code>127.0.0.1</code>。</p>
+<h3 id="Logging"><a href="#Logging" class="headerlink" title="Logging"></a>Logging</h3><p><em>accesslog</em></p>
+<ul>
+<li><p>  <code>--access-logfile FILE</code></p>
+</li>
+<li><p>  <code>None</code></p>
+</li>
+</ul>
+<p>The Access log file to write to.</p>
+<p>记录访问日志的文件路径。</p>
+<p>‘-‘ means log to stdout.</p>
+<p>‘-‘表示日志输出到标准输出。</p>
+<p><em>access_log_format</em></p>
+<ul>
+<li><p>  <code>--access-logformat STRING</code></p>
+</li>
+<li><p>  <code>%(h)s %(l)s %(u)s %(t)s &quot;%(r)s&quot; %(s)s %(b)s &quot;%(f)s&quot; &quot;%(a)s&quot;</code></p>
+</li>
+</ul>
+<p>The access log format.</p>
+<p>访问日志格式。</p>
+<pre><code>Identifier  Description
+h   remote address
+l   &#39;-&#39;
+u   user name
+t   date of the request
+r   status line (e.g. GET / HTTP/1.1)
+m   request method
+U   URL path without query string
+q   query string
+H   protocol
+s   status
+B   response length
+b   response length or &#39;-&#39; (CLF format)
+f   referer
+a   user agent
+T   request time in seconds
+D   request time in microseconds
+L   request time in decimal seconds
+p   process ID
+&#123;Header&#125;i   request header
+&#123;Header&#125;o   response header
+&#123;Variable&#125;e environment variable
+</code></pre>
+<p><em>errorlog</em></p>
+<ul>
+<li><p>  <code>--error-logfile FILE, --log-file FILE</code></p>
+</li>
+<li><p>  <code>-</code></p>
+</li>
+</ul>
+<p>The Error log file to write to.</p>
+<p>记录错误日志的文件。</p>
+<p>Using ‘-‘ for FILE makes gunicorn log to stderr.</p>
+<p>‘-‘表示输出到标准错误输出。</p>
+<p>Changed in version 19.2: Log to stderr by default.</p>
+<p>19.2中做出改变： 默认输出到标准错误输出。</p>
+<p><em>loglevel</em></p>
+<ul>
+<li><p>  <code>--log-level LEVEL</code></p>
+</li>
+<li><p>  <code>info</code></p>
+</li>
+</ul>
+<p>The granularity of Error log outputs.</p>
+<p>输出错误日志的粒度(不低于该级别)。</p>
+<p>Valid level names are:</p>
+<p>有效的级别有：</p>
+<pre><code>debug
+info
+warning
+error
+critical
+</code></pre>
+<p><em>capture_output</em></p>
+<ul>
+<li><p>  <code>--capture-output</code></p>
+</li>
+<li><p>  <code>False</code></p>
+</li>
+</ul>
+<p>Redirect stdout/stderr to Error log.</p>
+<p>把错误日志重定向到 标准输出/错误。</p>
+<p>New in version 19.6.</p>
+<p>19.6中新增。</p>
+<p><em>logger_class</em></p>
+<ul>
+<li><p>  <code>--logger-class STRING</code></p>
+</li>
+<li><p>  <code>gunicorn.glogging.Logger</code></p>
+</li>
+</ul>
+<p>The logger you want to use to log events in Gunicorn.</p>
+<p>你想用来记录事件的日志器。</p>
+<p>The default class (gunicorn.glogging.Logger) handle most of normal usages in logging. It provides error and access logging.</p>
+<p>默认的类是<em>gunicorn.glogging.Logger</em>， 能够满足大多数的日志需要。它提供错误和访问记录。</p>
+<p>You can provide your own worker by giving Gunicorn a Python path to a subclass like gunicorn.glogging.Logger. Alternatively the syntax can also load the Logger class with egg:gunicorn#simple.</p>
+<p>你可以通过配置<em>gunicorn.glogging.Logger</em>的子类来提供给工作者新的日志器。 也可以通过<em>egg:gunicorn</em>的语法来加载日志器。</p>
+<p><em>logconfig</em></p>
+<ul>
+<li><p>  –log-config FILE*</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>The log config file to use. Gunicorn uses the standard Python logging module’s Configuration file format.</p>
+<p>要使用的日志配置文件。 Gunicorn使用标准的Python日志模块配置文件形式。</p>
+<p><em>syslog_addr</em></p>
+<ul>
+<li><p>  –log-syslog-to SYSLOG_ADDR</p>
+</li>
+<li><p>  udp://localhost:514</p>
+</li>
+</ul>
+<p>Address to send syslog messages.</p>
+<p>发送系统消息的地址。</p>
+<p>Address is a string of the form:</p>
+<p>字符串形式。</p>
+<ul>
+<li>  unix://PATH#TYPE : for unix domain socket. TYPE can be stream for the stream driver or dgram for the dgram driver. stream is the default.</li>
+</ul>
+<p>用于UNIX域套接字。 <em>TYPE</em>可以是流驱动接收的<em>stream</em>或者数据报接收的<em>dgram</em>。默认是<em>stream</em>。</p>
+<ul>
+<li>  udp://HOST:PORT : for UDP sockets</li>
+</ul>
+<p>用于UDP套接字。</p>
+<ul>
+<li>  tcp://HOST:PORT : for TCP sockets</li>
+</ul>
+<p>用于TCP套接字。</p>
+<p><em>syslog</em></p>
+<ul>
+<li><p>  –log-syslog</p>
+</li>
+<li><p>  False</p>
+</li>
+</ul>
+<p>Send Gunicorn logs to syslog.</p>
+<p>把Gunicorn日志添加到系统日志(syslog)。</p>
+<p><em>syslog_prefix</em></p>
+<ul>
+<li><p>  –log-syslog-prefix SYSLOG_PREFIX</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>Makes Gunicorn use the parameter as program-name in the syslog entries.</p>
+<p>让Gunicorn在syslog中使用该参数作为程序名。</p>
+<p>All entries will be prefixed by gunicorn.<prefix>. By default the program name is the name of the process.</p>
+<p>所有的日志项都会以*gunicorn.<prefix>*作为前缀。默认情况下， 程序名是进程的名字。</p>
+<p><em>syslog_facility</em></p>
+<ul>
+<li><p>  –log-syslog-facility SYSLOG_FACILITY</p>
+</li>
+<li><p>  user</p>
+</li>
+</ul>
+<p>Syslog facility name</p>
+<p>系统日志设备名。</p>
+<p><em>enable_stdio_inheritance</em></p>
+<ul>
+<li><p>  -R, –enable-stdio-inheritance</p>
+</li>
+<li><p>  False</p>
+</li>
+</ul>
+<p>Enable stdio inheritance.</p>
+<p>启动标准输入输出继承。</p>
+<p>Enable inheritance for stdio file descriptors in daemon mode.</p>
+<p>在后台模式下， 启用对标准输入输出文件描述符的继承。</p>
+<p>Note: To disable the Python stdout buffering, you can to set the user environment variable PYTHONUNBUFFERED .</p>
+<p>注意： 为了禁用Python标准输出的缓冲， 你可以设置<em>PYTHONUNBUFFERED</em>这个环境变量。</p>
+<p><em>statsd_host</em></p>
+<ul>
+<li><p>  –statsd-host STATSD_ADDR</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>host:port of the statsd server to log to.</p>
+<p>记录日志的statsd server的<em>host:port</em>。</p>
+<p>New in version 19.1.</p>
+<p>19.1中新增该参数。</p>
+<p><em>statsd_prefix</em></p>
+<ul>
+<li>  –statsd-prefix STATSD_PREFIX</li>
+</ul>
+<p>Prefix to use when emitting statsd metrics (a trailing . is added, if not provided).</p>
+<p>当触发statsd 时， 使用的前缀。（如果没提供， 会在末尾加上 *.*）</p>
+<p>New in version 19.2.</p>
+<h3 id="Process-Naming"><a href="#Process-Naming" class="headerlink" title="Process Naming"></a>Process Naming</h3><p><em>proc_name</em></p>
+<ul>
+<li><p>  -n STRING, –name STRING</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>A base to use with setproctitle for process naming.</p>
+<p>使用该选项需要先安装setproctitle 。</p>
+<p>This affects things like ps and top. If you’re going to be running more than one instance of Gunicorn you’ll probably want to set a name to tell them apart. This requires that you install the setproctitle module.</p>
+<p>这会影响<em>ps</em>和<em>top</em>命令的显示结果。如果你运行了多个Gunicorn，你很可能想通过名称区分它们。这要求你安装setproctitle 模块。</p>
+<p>If not set, the default_proc_name setting will be used.</p>
+<p>如果未设置， 会使用*default_proc_name *的设置。</p>
+<p><em>default_proc_name</em></p>
+<ul>
+<li>gunicorn  Internal setting that is adjusted for each type of application.</li>
+</ul>
+<p>为每类应用条结果的内部配置。</p>
+<h3 id="Django"><a href="#Django" class="headerlink" title="Django"></a>Django</h3><ul>
+<li><p>  django_settings*</p>
+</li>
+<li><p>  –settings STRING</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>The Python path to a Django settings module. (deprecated)</p>
+<p>指向Django配置模块的Python举例(已弃用)。</p>
+<p>e.g. myproject.settings.main. If this isn’t provided, the DJANGO_SETTINGS_MODULE environment variable will be used.</p>
+<p>例如： <em>myproject.settings.main</em>。 如果该参数未提供， 会使用<em>DJANGO_SETTINGS_MODULE</em>环境变量</p>
+<p>DEPRECATED: use the –env argument instead.</p>
+<p>已弃用： 使用 <em>–env</em> 变量作为替代。</p>
+<h3 id="Server-Mechanics-1"><a href="#Server-Mechanics-1" class="headerlink" title="Server Mechanics"></a>Server Mechanics</h3><p><em>pythonpath</em></p>
+<ul>
+<li><p>  –pythonpath STRING</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>A comma-separated list of directories to add to the Python path.</p>
+<p>逗号分隔的待添加的python路径的目录。</p>
+<p>e.g. ‘/home/djangoprojects/myproject,/home/python/mylibrary’.</p>
+<p>例如， <em>‘/home/djangoprojects/myproject,/home/python/mylibrary’</em></p>
+<p><em>paste</em></p>
+<ul>
+<li><p>  –paste STRING, –paster STRING</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>Load a PasteDeploy config file. The argument may contain a # symbol followed by the name of an app section from the config file, e.g. production.ini#admin.</p>
+<p>加载PasteDeploy的配置文件。参数中可能包含*#*符号，后面跟着配置的一部分， 如: <em>production.ini#admin</em></p>
+<p>At this time, using alternate server blocks is not supported. Use the command line arguments to control server configuration instead.</p>
+<p>此时， 不支持使用替代的服务器块。要使用命令行参数来控制服务器参数。</p>
+<h3 id="Server-Hooks"><a href="#Server-Hooks" class="headerlink" title="Server Hooks"></a>Server Hooks</h3><p><em>on_starting</em></p>
+<pre><code>def on_starting(server):
+    pass
+</code></pre>
+<p>Called just before the master process is initialized.</p>
+<p>在主进程初始化前调用。</p>
+<p>The callable needs to accept a single instance variable for the Arbiter.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例。</p>
+<p><em>on_reload</em></p>
+<pre><code>def on_reload(server):
+
+    pass
+</code></pre>
+<p>Called to recycle workers during a reload via SIGHUP.</p>
+<p>接收SIGHUP信号， 重启工作者时，调用。</p>
+<p>The callable needs to accept a single instance variable for the Arbiter.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例。</p>
+<p><em>when_ready</em></p>
+<pre><code>def when_ready(server):
+
+    pass
+</code></pre>
+<p>Called just after the server is started.</p>
+<p>服务器启动时，被调用。</p>
+<p>The callable needs to accept a single instance variable for the Arbiter.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例。</p>
+<p><em>pre_fork</em></p>
+<pre><code>def pre_fork(server, worker):
+
+    pass
+</code></pre>
+<p>Called just before a worker is forked.</p>
+<p>在工作者进程被fork之前调用。</p>
+<p>The callable needs to accept two instance variables for the Arbiter and new Worker.</p>
+<p>该函数需要接受：一个掌控者(Arbiter)的实例， 一个新工作者进程。</p>
+<p><em>post_fork</em></p>
+<pre><code>def post_fork(server, worker):
+
+    pass
+</code></pre>
+<p>Called just after a worker has been forked.</p>
+<p>在一个工作者进程被fork之后调用。</p>
+<p>The callable needs to accept two instance variables for the Arbiter and new Worker.</p>
+<p>该函数需要接受：一个掌控者(Arbiter)的实例， 一个新工作者进程。</p>
+<p><em>post_worker_init</em></p>
+<pre><code>def post_worker_init(worker):
+
+    pass
+</code></pre>
+<p>Called just after a worker has initialized the application.</p>
+<p>在一个工作者初始化应用之后， 被调用。</p>
+<p>The callable needs to accept one instance variable for the initialized Worker.</p>
+<p>该调用需要接受一个已初始化的工作者进程。</p>
+<p><em>worker_int</em></p>
+<pre><code>def worker_int(worker):
+
+    pass
+</code></pre>
+<p>Called just after a worker exited on SIGINT or SIGQUIT.</p>
+<p>在一个工作者进程接收SIGINT或SIGQUIT信号退出后被调用。</p>
+<p>The callable needs to accept one instance variable for the initialized Worker.</p>
+<p>该调用需要接受一个已初始化的工作者进程。</p>
+<p><em>worker_abort</em></p>
+<pre><code>def worker_abort(worker):
+
+    pass
+</code></pre>
+<p>Called when a worker received the SIGABRT signal.</p>
+<p>当工作者进程接收到SIGABRI信号时，被调用。</p>
+<p>This call generally happens on timeout.</p>
+<p>通常发生超时时，才被调用。</p>
+<p>The callable needs to accept one instance variable for the initialized Worker.</p>
+<p>该调用需要接受一个已初始化的工作者进程。</p>
+<p><em>pre_exec</em></p>
+<pre><code>def pre_exec(server):
+
+    pass
+</code></pre>
+<p>Called just before a new master process is forked.</p>
+<p>在一个新的主进程被fork之前调用。</p>
+<p>The callable needs to accept a single instance variable for the Arbiter.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例。</p>
+<p><em>pre_request</em></p>
+<pre><code>def pre_request(worker, req):
+
+    worker.log.debug(&quot;%s %s&quot; % (req.method, req.path))
+</code></pre>
+<p>Called just before a worker processes the request.</p>
+<p>在工作者进程处理请求之前调用。</p>
+<p>The callable needs to accept two instance variables for the Worker and the Request.</p>
+<p>该调用需要接受一个已初始化的工作者进程、一个请求实例。</p>
+<p><em>post_request</em></p>
+<pre><code>def post_request(worker, req, environ, resp):
+
+    pass
+</code></pre>
+<p>Called after a worker processes the request.</p>
+<p>在工作者进程处理请求之后调用。</p>
+<p>The callable needs to accept two instance variables for the Worker and the Request.</p>
+<p>该调用需要接受一个已初始化的工作者进程、一个请求实例。</p>
+<p><em>worker_exit</em></p>
+<pre><code>def worker_exit(server, worker):
+
+    pass
+</code></pre>
+<p>Called just after a worker has been exited.</p>
+<p>在工作者进程退出后被调用。</p>
+<p>The callable needs to accept two instance variables for the Arbiter and the just-exited Worker.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例、一个刚刚退出的工作者。</p>
+<p><em>nworkers_changed</em></p>
+<pre><code>def nworkers_changed(server, new_value, old_value):
+
+     pass
+</code></pre>
+<p>Called just after num_workers has been changed.</p>
+<p>在<strong>num_workers</strong>改变之后调用。</p>
+<p>The callable needs to accept an instance variable of the Arbiter and two integers of number of workers after and before change.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例以及两个整数：在改变前后的进程数。</p>
+<p>If the number of workers is set for the first time, old_value would be None.</p>
+<p>如果进程数是第一次设置， old_value是None。</p>
+<p><em>on_exit</em></p>
+<pre><code>def on_exit(server):
+
+    pass
+</code></pre>
+<p>Called just before exiting Gunicorn.</p>
+<p>在退出GUnicorn之前调用。</p>
+<p>The callable needs to accept a single instance variable for the Arbiter.</p>
+<p>该函数需要接受一个掌控者(Arbiter)的实例。</p>
+<h3 id="Server-Mechanics-2"><a href="#Server-Mechanics-2" class="headerlink" title="Server Mechanics"></a>Server Mechanics</h3><p><em>proxy_protocol</em></p>
+<ul>
+<li>  –proxy-protocol</li>
+<li>  False</li>
+</ul>
+<p>Enable detect PROXY protocol (PROXY mode).</p>
+<p>启用监测PROXY协议。</p>
+<p>Allow using HTTP and Proxy together. It may be useful for work with stunnel as HTTPS frontend and Gunicorn as HTTP server.</p>
+<p>允许同时使用HTTP和Proxy协议。对于前段使用HTTPS、后端使用Gunicorn有帮助。</p>
+<p>PROXY protocol: <a target="_blank" rel="noopener" href="http://haproxy.1wt.eu/download/1.5/doc/proxy-protocol.txt">http://haproxy.1wt.eu/download/1.5/doc/proxy-protocol.txt</a></p>
+<p>Example for stunnel config:</p>
+<p>例子：</p>
+<pre><code>[https]
+protocol = proxy
+accept  = 443
+connect = 80
+cert = /etc/ssl/certs/stunnel.pem
+key = /etc/ssl/certs/stunnel.key
+</code></pre>
+<p><em>proxy_allow_ips</em></p>
+<ul>
+<li><p>  –proxy-allow-from</p>
+</li>
+<li><p>  127.0.0.1</p>
+</li>
+</ul>
+<p>Front-end’s IPs from which allowed accept proxy requests (comma separate).</p>
+<p>Set to * to disable checking of Front-end IPs (useful for setups where you don’t know in advance the IP address of Front-end, but you still trust the environment)</p>
+<h3 id="SSL"><a href="#SSL" class="headerlink" title="SSL"></a>SSL</h3><p><em>keyfile</em></p>
+<p>*–keyfile FILE</p>
+<ul>
+<li>  None</li>
+</ul>
+<p>SSL key file</p>
+<p>SSL秘钥文件。</p>
+<p><em>certfile</em></p>
+<ul>
+<li><p>  –certfile FILE</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>SSL certificate file</p>
+<p>SSL证书文件。</p>
+<p><em>ssl_version</em></p>
+<ul>
+<li><p>  –ssl-version</p>
+</li>
+<li><p>  3</p>
+</li>
+</ul>
+<p>SSL version to use (see stdlib ssl module’s)</p>
+<p>使用的SSL版本。</p>
+<p><em>cert_reqs</em></p>
+<p>*–cert-reqs</p>
+<p>*0</p>
+<p>Whether client certificate is required (see stdlib ssl module’s)</p>
+<p>是否要求客户端有证书。</p>
+<p><em>ca_certs</em></p>
+<ul>
+<li><p>  –ca-certs FILE</p>
+</li>
+<li><p>  None</p>
+</li>
+</ul>
+<p>CA certificates file</p>
+<p>CA证书。</p>
+<p><em>suppress_ragged_eofs</em></p>
+<ul>
+<li><p>  –suppress-ragged-eofs</p>
+</li>
+<li><p>  True</p>
+</li>
+</ul>
+<p>Suppress ragged EOFs (see stdlib ssl module’s)</p>
+<p>支持不规则的EOFs。</p>
+<p><em>do_handshake_on_connect</em></p>
+<ul>
+<li><p>  –do-handshake-on-connect</p>
+</li>
+<li><p>  False</p>
+</li>
+</ul>
+<p>Whether to perform SSL handshake on socket connect (see stdlib ssl module’s)</p>
+<p>在socket建立时， 是否执行SSL握手。</p>
+<p><em>ciphers</em></p>
+<ul>
+<li><p>  –ciphers</p>
+</li>
+<li><p>  TLSv1</p>
+</li>
+</ul>
+<p>Ciphers to use (see stdlib ssl module’s)</p>
+<p>使用的加密。</p>
+<h3 id="Server-Mechanics-3"><a href="#Server-Mechanics-3" class="headerlink" title="Server Mechanics"></a>Server Mechanics</h3><p><em>raw_paste_global_conf</em></p>
+<ul>
+<li><p>  –paste-global CONF</p>
+</li>
+<li><p>  []</p>
+</li>
+</ul>
+<p>Set a PasteDeploy global config variable (key=value).</p>
+<p>设置PasteDeploy全局的配置变量。</p>
+<p>The option can be specified multiple times.</p>
+<p>可以被重复指定。</p>
+<p>The variables are passed to the the PasteDeploy entrypoint. Ex.:</p>
+<p>该变量被传递给PasteDeploy， 例如：</p>
+<pre><code>$ gunicorn -b 127.0.0.1:8000 --paste development.ini --paste-global FOO=1 --paste-global BAR=2
+</code></pre>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="tag"># gunicorn官方文档</a>
+          
+            <a href="/tags/gunicorn%E8%AE%BE%E7%BD%AE/" rel="tag"># gunicorn设置</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E5%AE%89%E8%A3%85/" rel="next" title="gunicorn官方文档翻译-安装">
+                <i class="fa fa-chevron-left"></i> gunicorn官方文档翻译-安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E5%AE%9A%E5%88%B6%E5%BA%94%E7%94%A8/" rel="prev" title="gunicorn官方文档翻译-定制应用">
+                gunicorn官方文档翻译-定制应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Settings-%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.</span> <span class="nav-text">Settings(设置)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Config-File-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">1.0.1.</span> <span class="nav-text">Config File(配置文件)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#config"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">config</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Socket"><span class="nav-number">1.0.2.</span> <span class="nav-text">Server Socket</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#bind"><span class="nav-number">1.0.2.1.</span> <span class="nav-text">bind</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#backlog"><span class="nav-number">1.0.2.2.</span> <span class="nav-text">backlog</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Worker-Processes"><span class="nav-number">1.0.2.3.</span> <span class="nav-text">Worker Processes</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Security"><span class="nav-number">1.0.3.</span> <span class="nav-text">Security</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Debugging"><span class="nav-number">1.0.4.</span> <span class="nav-text">Debugging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Mechanics"><span class="nav-number">1.0.5.</span> <span class="nav-text">Server Mechanics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Logging"><span class="nav-number">1.0.6.</span> <span class="nav-text">Logging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Process-Naming"><span class="nav-number">1.0.7.</span> <span class="nav-text">Process Naming</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Django"><span class="nav-number">1.0.8.</span> <span class="nav-text">Django</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Mechanics-1"><span class="nav-number">1.0.9.</span> <span class="nav-text">Server Mechanics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Hooks"><span class="nav-number">1.0.10.</span> <span class="nav-text">Server Hooks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Mechanics-2"><span class="nav-number">1.0.11.</span> <span class="nav-text">Server Mechanics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SSL"><span class="nav-number">1.0.12.</span> <span class="nav-text">SSL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Mechanics-3"><span class="nav-number">1.0.13.</span> <span class="nav-text">Server Mechanics</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

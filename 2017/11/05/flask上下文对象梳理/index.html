@@ -1,0 +1,774 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="flask上下文," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="动机目前，项目组只使用flask框架用于web开发；目前，开发同学对flask上下文的理解还有部分盲区，因有此文。 (基于flask&#x3D;&#x3D;0.10.1、werkzeug&#x3D;&#x3D;0.11进行编排)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask上下文对象梳理">
+<meta property="og:url" content="http://yoursite.com/2017/11/05/flask%E4%B8%8A%E4%B8%8B%E6%96%87%E5%AF%B9%E8%B1%A1%E6%A2%B3%E7%90%86/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="动机目前，项目组只使用flask框架用于web开发；目前，开发同学对flask上下文的理解还有部分盲区，因有此文。 (基于flask&#x3D;&#x3D;0.10.1、werkzeug&#x3D;&#x3D;0.11进行编排)">
+<meta property="og:locale">
+<meta property="og:image" content="http://img.matrix.netease.com:9090/img/image_e2ddb7d583c20f9.png">
+<meta property="article:published_time" content="2017-11-05T12:09:23.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.512Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="flask上下文">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://img.matrix.netease.com:9090/img/image_e2ddb7d583c20f9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/05/flask上下文对象梳理/"/>
+
+
+
+
+
+  <title> flask上下文对象梳理 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/05/flask%E4%B8%8A%E4%B8%8B%E6%96%87%E5%AF%B9%E8%B1%A1%E6%A2%B3%E7%90%86/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                flask上下文对象梳理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-05T20:09:23+08:00">
+                2017-11-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>目前，项目组只使用flask框架用于web开发；目前，开发同学对flask上下文的理解还有部分盲区，因有此文。</p>
+<p>(基于<code>flask==0.10.1</code>、<code>werkzeug==0.11</code>进行编排)</p>
+<span id="more"></span>
+
+<h2 id="从thread-local说起"><a href="#从thread-local说起" class="headerlink" title="从thread-local说起"></a>从thread-local说起</h2><p>目前，鉴于线程(广义，含<code>协程</code>)的资源占用少、开发方便，web框架多使用多线程模式进行http request处理, 如: spring、jfinal、flask等。</p>
+<p>这些框架，并没有显式地使用各自语言下的Thread对象、而是通过thread local来实现。</p>
+<h3 id="thread-local对象"><a href="#thread-local对象" class="headerlink" title="thread local对象"></a>thread local对象</h3><p>thread local 即: 线程私有的局部变量。通常情况下，我们创建的变量是可以被任何一个线程访问并修改的。而thread local 变量只能被当前线程访问，其他线程则无法访问和修改。</p>
+<p>thread local 变量既是local的又是global的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Global 意思是在当前线程中，任何一个点都可以访问到ThreadLocal的值。</span><br><span class="line">Local 意思是该线程的ThreadLocal只能被该线程访问，一般情况下其他线程访问不到。</span><br></pre></td></tr></table></figure>
+
+<h3 id="werkzeug的Local"><a href="#werkzeug的Local" class="headerlink" title="werkzeug的Local"></a>werkzeug的Local</h3><p>从werkzeug的<a target="_blank" rel="noopener" href="https://github.com/pallets/werkzeug/blob/master/werkzeug/local.py">Local类</a>源码可知，<code>Local</code>对象的结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;__ident_func__&quot;: get_ident,   # 获得当前线程id的函数对象</span><br><span class="line">    &quot;__storage__&quot;: &#123;    # 存储各个线程下的变量映射</span><br><span class="line">        &quot;线程1-ID&quot;: &#123;</span><br><span class="line">            &quot;变量1-名称&quot;： xxx,</span><br><span class="line">            &quot;变量2-名称&quot;: xx,</span><br><span class="line">            ...</span><br><span class="line">        &#125;,</span><br><span class="line">        &quot;线程2-ID&quot;: &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么， 假设Local对象的名称是<code>local</code>,在每个线程的上下文中，</p>
+<ol>
+<li><p>通过<code>local.var = val</code>, 最终会进行如下设置:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local.__storage__[当前线程id][var] = val</span><br></pre></td></tr></table></figure></li>
+<li><p>通过<code>local.var</code>访问变量<code>var</code>, 会自动返回:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local.__storage__[当前线程id][var]</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="werkzeug中的LocalStack"><a href="#werkzeug中的LocalStack" class="headerlink" title="werkzeug中的LocalStack"></a>werkzeug中的LocalStack</h3><p>werkzeug中的<code>LocalStack</code>，从名字上看，容易让人<strong>误以为</strong>:</p>
+<blockquote>
+<p> 多个local对象组成的一个stack</p>
+</blockquote>
+<p>但实际上，它和<code>werkzeug.Local</code>用法相同，只是存储的每个变量的<code>值</code>都是一个:</p>
+<blockquote>
+<p>list实现的stack</p>
+</blockquote>
+<h3 id="代理模式与werkzeug中的LocalProxy"><a href="#代理模式与werkzeug中的LocalProxy" class="headerlink" title="代理模式与werkzeug中的LocalProxy"></a>代理模式与werkzeug中的LocalProxy</h3><p>代理模式，主要用于</p>
+<blockquote>
+<p>只访问代理对象，避免直接访问目标对象时带来的问题, 可对目标对象进行保护、追踪。</p>
+</blockquote>
+<p>如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PM (代理对象) 作为开发人员(被代理对象)和客户之间的居间人;</span><br><span class="line"></span><br><span class="line">客户不能直接和开发人员沟通, 而是向PM提要求，PM再将要求转给开发人员</span><br></pre></td></tr></table></figure>
+
+<p>这样做的好处有:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. PM可以记录需求</span><br><span class="line">2. 存在多个开发人员的情况下，客户要一对多的沟通，成本太高</span><br><span class="line">3. 出了问题，开发人员不需要直面客户指责</span><br><span class="line">4. ...</span><br></pre></td></tr></table></figure>
+
+<p><code>werkzeug.LocalProxy</code>， 这个可以顾名思义:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Local对象的Proxy, 即： 该LocalProxy代理了一个local对象</span><br></pre></td></tr></table></figure>
+
+<p>但是，<strong>只是代理local对象并没多大意义</strong>，因为对线程而言：</p>
+<blockquote>
+<p>local中存储的变量才是重要的</p>
+</blockquote>
+<p>所以，</p>
+<blockquote>
+<p>LocalProxy实际上代理的，是local中的变量</p>
+</blockquote>
+<p>如:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">from werkzeug import Local, LocalProxy</span><br><span class="line">l = Local()</span><br><span class="line">l.user = &#123;&#x27;id&#x27;: 1&#125;</span><br><span class="line">print l.user</span><br><span class="line"># user 会代理l.user对象</span><br><span class="line">user = LocalProxy(l, &#x27;user&#x27;)</span><br><span class="line">print user</span><br><span class="line"></span><br><span class="line">user[&#x27;name&#x27;] = &#x27;hulk&#x27;</span><br><span class="line">print user</span><br><span class="line">print l.user</span><br></pre></td></tr></table></figure>
+<p>则输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; from werkzeug import Local, LocalProxy</span><br><span class="line">&gt;&gt;&gt; l = Local()</span><br><span class="line">&gt;&gt;&gt; l.user = &#123;&#x27;id&#x27;: 1&#125;</span><br><span class="line">&gt;&gt;&gt; print l.user</span><br><span class="line">&#123;&#x27;id&#x27;: 1&#125;</span><br><span class="line">&gt;&gt;&gt; user = LocalProxy(l, &#x27;user&#x27;)</span><br><span class="line">&gt;&gt;&gt; print user</span><br><span class="line">&#123;&#x27;id&#x27;: 1&#125;</span><br><span class="line">&gt;&gt;&gt; </span><br><span class="line">&gt;&gt;&gt; user[&#x27;name&#x27;] = &#x27;hulk&#x27;</span><br><span class="line">&gt;&gt;&gt; print user</span><br><span class="line">&#123;&#x27;id&#x27;: 1, &#x27;name&#x27;: &#x27;hulk&#x27;&#125;</span><br><span class="line">&gt;&gt;&gt; print l.user</span><br><span class="line">&#123;&#x27;id&#x27;: 1, &#x27;name&#x27;: &#x27;hulk&#x27;&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="threading-local-v-s-werkzeug-Local"><a href="#threading-local-v-s-werkzeug-Local" class="headerlink" title="threading.local v.s. werkzeug.Local"></a>threading.local v.s. werkzeug.Local</h3><ol>
+<li>werkzeug.Local在Greenlet 可用的情况下优先使用 Greenlet的<code>get_ident</code>而不是<code>thread</code>的<code>get_ident</code></li>
+<li>werkzeug.Local定义了<code>__release_local_</code>, 防止内存泄露；而<code>threading.local</code>不行</li>
+</ol>
+<h2 id="flask中的上下文"><a href="#flask中的上下文" class="headerlink" title="flask中的上下文"></a>flask中的上下文</h2><p><code>flask.Flask</code>的实例对象既可以在<strong>web环境</strong>中使用、也可以在<strong>非web环境</strong>中使用；</p>
+<p>flask的上下文则分为了: </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 应用上下文, 后文用app_context指代</span><br><span class="line">2. 请求上下文, 后文用request_context指代</span><br></pre></td></tr></table></figure>
+
+<h3 id="应用上下文"><a href="#应用上下文" class="headerlink" title="应用上下文"></a>应用上下文</h3><p>app_context既能够直接用于web环境又能用与非web环境， 它是<code>AppContext</code>对象的实例， 结构如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AppContext</span><br><span class="line">    app  # 当前的flask应用对象</span><br><span class="line">    url_adapter  # 对请求进行适配</span><br><span class="line">    g    # 不解释了</span><br></pre></td></tr></table></figure>
+
+<p>所以，(非)web环境下，都可以直接访问g属性。</p>
+<h3 id="请求上下文"><a href="#请求上下文" class="headerlink" title="请求上下文"></a>请求上下文</h3><p><code>request_context</code>, 即：在http request处理过程中，所依赖的上下文。在web环境下，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">是先创建request_context, 再创建app_context的</span><br></pre></td></tr></table></figure>
+
+<p>那我们先看一下，flask的实现逻辑是怎么样的，再来解释一下这两个疑问。</p>
+<p>request_context的生命周期流程如下图：</p>
+<p><img src="http://img.matrix.netease.com:9090/img/image_e2ddb7d583c20f9.png" alt="声明周期"></p>
+<p>我们只关心: </p>
+<pre><code>1. 2. 4 三个过程
+</code></pre>
+<h4 id="过程1-创建一个新的request-context"><a href="#过程1-创建一个新的request-context" class="headerlink" title="过程1. 创建一个新的request_context"></a>过程1. 创建一个新的request_context</h4><p>这个request_context是<code>RequestContext</code>的实例对象:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">RequestContext</span><br><span class="line">    app   # 当前的flask应用对象</span><br><span class="line">    request  # 当前的request对象</span><br><span class="line">    url_adapter # 对请求进行匹配</span><br><span class="line">    flashes     # 对该请求处理后，可能的提示信息</span><br><span class="line">    session     # 不解释</span><br></pre></td></tr></table></figure>
+
+<h4 id="过程2-将request-context推送到栈顶"><a href="#过程2-将request-context推送到栈顶" class="headerlink" title="过程2. 将request_context推送到栈顶"></a>过程2. 将request_context推送到栈顶</h4><p>详细步骤如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 创建一个新的app_context对象，并push到_app_ctx_stack的栈顶</span><br><span class="line">2. 把当前的request_context push 到_request_ctx_stack的栈顶</span><br><span class="line">3. 打开session</span><br></pre></td></tr></table></figure>
+
+<p>注意： 过程2如果发生异常，是不会被flask应用对象捕获的，因为没有放在<br><code>try-except</code>语句中。</p>
+<h4 id="过程3-释放上下文"><a href="#过程3-释放上下文" class="headerlink" title="过程3. 释放上下文"></a>过程3. 释放上下文</h4><p>默认情况下，如果请求处理过程中，发生了异常，异常信息会被捕获，上下文不会被释放；</p>
+<p>否则，会释放请求上线问和应用上下文。</p>
+<h3 id="应用上下文为何与请求上下文分离"><a href="#应用上下文为何与请求上下文分离" class="headerlink" title="应用上下文为何与请求上下文分离"></a>应用上下文为何与请求上下文分离</h3><p>请求上下文，往往会限制在web环境下， 或者必须创造出一个request请求才可以；</p>
+<p>而应用上下文则不受http request的限制。</p>
+<h3 id="上下文Stack存在的意义"><a href="#上下文Stack存在的意义" class="headerlink" title="上下文Stack存在的意义"></a>上下文Stack存在的意义</h3><h4 id="先说app-context栈"><a href="#先说app-context栈" class="headerlink" title="先说app_context栈"></a>先说app_context栈</h4><p>如果在一个线程上下文里面，只操作一个app对象， 似乎栈不用也可以，但假如操作多个app呢？如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">with app1.app_context():</span><br><span class="line">    ...</span><br><span class="line">    with app2.app_context():</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+<p>使用stack就很方便了，嵌在最里面的<code>with appn.app_context():</code>, appn对应的app_context对象总是在栈顶，当with语句退出，栈顶的上下文对象就会被pop出来。</p>
+<h4 id="再说request-context栈"><a href="#再说request-context栈" class="headerlink" title="再说request_context栈"></a>再说request_context栈</h4><p>web环境下，一个线程处理一个请求，所以可以不使用栈；但是非web环境下(如接口测试脚本)，一个线程可能会处理多个请求，使用stack会更方便。</p>
+<h3 id="flask中的全局对象"><a href="#flask中的全局对象" class="headerlink" title="flask中的全局对象"></a>flask中的全局对象</h3><p>flask中的全局上下文对象有：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">_request_ctx_stack = LocalStack()</span><br><span class="line">_app_ctx_stack = LocalStack()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">current_app = LocalProxy(_find_app)</span><br><span class="line">request = LocalProxy(partial(_lookup_req_object, &#x27;request&#x27;))</span><br><span class="line">session = LocalProxy(partial(_lookup_req_object, &#x27;session&#x27;))</span><br><span class="line">g = LocalProxy(partial(_lookup_app_object, &#x27;g&#x27;)</span><br></pre></td></tr></table></figure>
+<p>由于后面4个(current_app、request、session、g)都是LocalProxy对象，通过<a target="_blank" rel="noopener" href="http://km.netease.com/article/237423">flask之g: 变与不变</a>对g的介绍，可以理解其它三个。</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p><a target="_blank" rel="noopener" href="http://droidyue.com/blog/2016/03/13/learning-threadlocal-in-java/index.html">理解Java中的ThreadLocal</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.jianshu.com/p/aef1520a2cb9">Flask上下文机制（Context）源码分析</a></p>
+<p><a target="_blank" rel="noopener" href="https://blog.tonyseek.com/post/the-context-mechanism-of-flask/">Flask 的 Context 机制</a></p>
+<p><a target="_blank" rel="noopener" href="http://blog.xiaohansong.com/2016/08/09/ThreadLocal-leak-analyze/">ThreadLocal 内存泄露的实例分析</a></p>
+<p><a target="_blank" rel="noopener" href="http://blog.xiaohansong.com/2016/08/06/ThreadLocal-memory-leak/">深入分析 ThreadLocal 内存泄漏问题</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flask%E4%B8%8A%E4%B8%8B%E6%96%87/" rel="tag"># flask上下文</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/02/flask%E4%B9%8Bg-%E5%8F%98%E4%B8%8E%E4%B8%8D%E5%8F%98/" rel="next" title="flask之g--变与不变">
+                <i class="fa fa-chevron-left"></i> flask之g--变与不变
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/18/werkzeug%E4%B8%AD%E4%B8%80%E4%BA%9B%E9%9D%9E%E6%A0%B8%E5%BF%83%E5%B7%A5%E5%85%B7%E7%9A%84%E5%AE%9E%E7%8E%B0/" rel="prev" title="werkzeug中一些非核心工具的实现">
+                werkzeug中一些非核心工具的实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8Ethread-local%E8%AF%B4%E8%B5%B7"><span class="nav-number">2.</span> <span class="nav-text">从thread-local说起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#thread-local%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.1.</span> <span class="nav-text">thread local对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#werkzeug%E7%9A%84Local"><span class="nav-number">2.2.</span> <span class="nav-text">werkzeug的Local</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#werkzeug%E4%B8%AD%E7%9A%84LocalStack"><span class="nav-number">2.3.</span> <span class="nav-text">werkzeug中的LocalStack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%90%86%E6%A8%A1%E5%BC%8F%E4%B8%8Ewerkzeug%E4%B8%AD%E7%9A%84LocalProxy"><span class="nav-number">2.4.</span> <span class="nav-text">代理模式与werkzeug中的LocalProxy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#threading-local-v-s-werkzeug-Local"><span class="nav-number">2.5.</span> <span class="nav-text">threading.local v.s. werkzeug.Local</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flask%E4%B8%AD%E7%9A%84%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">3.</span> <span class="nav-text">flask中的上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">3.1.</span> <span class="nav-text">应用上下文</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">3.2.</span> <span class="nav-text">请求上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B1-%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E6%96%B0%E7%9A%84request-context"><span class="nav-number">3.2.1.</span> <span class="nav-text">过程1. 创建一个新的request_context</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B2-%E5%B0%86request-context%E6%8E%A8%E9%80%81%E5%88%B0%E6%A0%88%E9%A1%B6"><span class="nav-number">3.2.2.</span> <span class="nav-text">过程2. 将request_context推送到栈顶</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B3-%E9%87%8A%E6%94%BE%E4%B8%8A%E4%B8%8B%E6%96%87"><span class="nav-number">3.2.3.</span> <span class="nav-text">过程3. 释放上下文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%BA%E4%BD%95%E4%B8%8E%E8%AF%B7%E6%B1%82%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%86%E7%A6%BB"><span class="nav-number">3.3.</span> <span class="nav-text">应用上下文为何与请求上下文分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87Stack%E5%AD%98%E5%9C%A8%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">3.4.</span> <span class="nav-text">上下文Stack存在的意义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%88%E8%AF%B4app-context%E6%A0%88"><span class="nav-number">3.4.1.</span> <span class="nav-text">先说app_context栈</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%8D%E8%AF%B4request-context%E6%A0%88"><span class="nav-number">3.4.2.</span> <span class="nav-text">再说request_context栈</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flask%E4%B8%AD%E7%9A%84%E5%85%A8%E5%B1%80%E5%AF%B9%E8%B1%A1"><span class="nav-number">3.5.</span> <span class="nav-text">flask中的全局对象</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

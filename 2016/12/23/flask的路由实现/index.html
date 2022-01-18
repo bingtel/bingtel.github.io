@@ -1,0 +1,892 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="flask,flask路由," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="动机请求分发，是找到适配用户请求的处理器(处理函数)的过程。这涉及到对路由的管理、适配等过程。大多数web框架对路由的管理思想是相同的，遵循了以下思想： 1. 把一个个的路由映射对象保存在一个列表中 2. 通过正则匹配和score规则，找到最匹配请求的handler 3. 调用handler处理请求 4. 返回响应内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask的路由实现">
+<meta property="og:url" content="http://yoursite.com/2016/12/23/flask%E7%9A%84%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="动机请求分发，是找到适配用户请求的处理器(处理函数)的过程。这涉及到对路由的管理、适配等过程。大多数web框架对路由的管理思想是相同的，遵循了以下思想： 1. 把一个个的路由映射对象保存在一个列表中 2. 通过正则匹配和score规则，找到最匹配请求的handler 3. 调用handler处理请求 4. 返回响应内容">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-22T23:22:57.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.596Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="flask">
+<meta property="article:tag" content="flask路由">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/23/flask的路由实现/"/>
+
+
+
+
+
+  <title> flask的路由实现 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/23/flask%E7%9A%84%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                flask的路由实现
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-23T07:22:57+08:00">
+                2016-12-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>请求分发，是找到适配用户请求的处理器(处理函数)的过程。这涉及到对路由的管理、<br>适配等过程。大多数web框架对路由的管理思想是相同的，遵循了以下思想：</p>
+<pre><code>1. 把一个个的路由映射对象保存在一个列表中
+2. 通过正则匹配和score规则，找到最匹配请求的handler
+3. 调用handler处理请求
+4. 返回响应内容
+</code></pre>
+<span id="more"></span>
+
+<p>Flask作为一个轻量级的Web框架，分析其的路由管理，具有一般性。</p>
+<h2 id="Flask的路由管理"><a href="#Flask的路由管理" class="headerlink" title="Flask的路由管理"></a>Flask的路由管理</h2><h3 id="保存路由规则"><a href="#保存路由规则" class="headerlink" title="保存路由规则"></a>保存路由规则</h3><p>通过查看<code>Flask</code>类的代码和注释，很容易发现，Flask使用<code>self.url_map</code>变量来保存路由规则的:</p>
+<pre><code>self.url_map = Map()
+</code></pre>
+<p>那么，路由是什么时候被添加到<code>self.url_map</code>里面的呢？<br>我们经常使用装饰器：</p>
+<pre><code>app.route(&#39;/this-is-uri&#39;, methods=[&#39;GET&#39;])
+def func(...):
+    pass
+    
+</code></pre>
+<p>来声明一条路由规则，所以，这就是路由被添加到<code>self.url_map</code>里面的入口函数， 代码如下：</p>
+<pre><code> def route(self, rule, **options):
+    &quot;&quot;&quot;
+    :param rule: the URL rule as string
+    :param endpoint: the endpoint for the registered URL rule.  Flask
+                     itself assumes the name of the view function as
+                     endpoint(函数名作为endpoint)
+    :param options: the options to be forwarded to the underlying
+                    :class:`~werkzeug.routing.Rule` object.  A change
+                    to Werkzeug is handling of method options.  methods
+                    is a list of methods this rule should be limited
+                    to (``GET``, ``POST`` etc.).  By default a rule
+                    just listens for ``GET`` (and implicitly ``HEAD``).
+                    Starting with Flask 0.6, ``OPTIONS`` is implicitly
+                    added and handled by the standard request handling.
+    &quot;&quot;&quot;
+    def decorator(f):
+        # endpoint 默认是None
+        # options默认是&#123;&#125;
+        endpoint = options.pop(&#39;endpoint&#39;, None)
+        self.add_url_rule(rule, endpoint, f, **options)
+        return f
+    return decorator
+    
+</code></pre>
+<p>我们要注意：</p>
+<pre><code>self.add_url_rule(rule, endpoint, f, **options)
+</code></pre>
+<p>从名字也可以看出，<code>add_url_rule</code>是把路由规则保存起来的过程，具体实现如下：</p>
+<pre><code>    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        &quot;&quot;&quot;Connects a URL rule.  Works exactly like the :meth:`route`
+        decorator.  If a view_func is provided it will be registered with the
+        endpoint.
+
+        Basically this example::
+
+            @app.route(&#39;/&#39;)
+            def index():
+                pass
+
+        Is equivalent to the following::
+
+            def index():
+                pass
+            app.add_url_rule(&#39;/&#39;, &#39;index&#39;, index)
+
+        If the view_func is not provided you will need to connect the endpoint
+        to a view function like so::
+
+            app.view_functions[&#39;index&#39;] = index
+
+        :param rule: the URL rule as string
+        :param endpoint: the endpoint for the registered URL rule.  Flask
+                         itself assumes the name of the view function as
+                         endpoint
+        :param view_func: the function to call when serving a request to the
+                          provided endpoint(endpoint对应的函数对象)
+        :param options: the options to be forwarded to the underlying
+                        :class:`~werkzeug.routing.Rule` object.  A change
+                        to Werkzeug is handling of method options.  methods
+                        is a list of methods this rule should be limited
+                        to (``GET``, ``POST`` etc.).  By default a rule
+                        just listens for ``GET`` (and implicitly ``HEAD``).
+                        Starting with Flask 0.6, ``OPTIONS`` is implicitly
+                        added and handled by the standard request handling.
+        &quot;&quot;&quot;
+        if endpoint is None:
+            # 注意怎么获取endpoint
+            endpoint = _endpoint_from_view_func(view_func)
+        options[&#39;endpoint&#39;] = endpoint
+        methods = options.pop(&#39;methods&#39;, None)
+
+        # if the methods are not given and the view_func object knows its
+        # methods we can use that instead.  If neither exists, we go with
+        # a tuple of only ``GET`` as default.
+        if methods is None:
+            methods = getattr(view_func, &#39;methods&#39;, None) or (&#39;GET&#39;,)
+        # 注意此处的string_types
+        if isinstance(methods, string_types):
+            raise TypeError(&#39;Allowed methods have to be iterables of strings, &#39;
+                            &#39;for example: @app.route(..., methods=[&quot;POST&quot;])&#39;)
+        # 转大写
+        methods = set(item.upper() for item in methods)
+
+        # Methods that should always be added
+        required_methods = set(getattr(view_func, &#39;required_methods&#39;, ()))
+
+        # starting with Flask 0.8 the view_func object can disable and
+        # force-enable the automatic options handling.
+        provide_automatic_options = getattr(view_func,
+            &#39;provide_automatic_options&#39;, None)
+
+        if provide_automatic_options is None:
+            if &#39;OPTIONS&#39; not in methods:
+                provide_automatic_options = True
+                required_methods.add(&#39;OPTIONS&#39;)
+            else:
+                provide_automatic_options = False
+
+        # Add the required methods now.
+        methods |= required_methods
+
+        # 创建一个映射规则
+        rule = self.url_rule_class(rule, methods=methods, **options)
+        rule.provide_automatic_options = provide_automatic_options
+        # 把规则保存到self.url_map中
+        self.url_map.add(rule)
+        # print list(self.url_map.iter_rules())
+        if view_func is not None:
+            old_func = self.view_functions.get(endpoint)
+            if old_func is not None and old_func != view_func:
+                raise AssertionError(&#39;View function mapping is overwriting an &#39;
+                                     &#39;existing endpoint function: %s&#39; % endpoint)
+            self.view_functions[endpoint] = view_func  
+</code></pre>
+<p>这里，可以看到：</p>
+<pre><code>rule = self.url_rule_class(rule, methods=methods, **options)
+self.url_map.add(rule)
+self.view_functions[endpoint] = view_func
+</code></pre>
+<p>即：<br>    将route()的相关参数封装成一个Rule，由self.url_rule_class指定<br>    把Rule保存到self.url_map<br>    建立函数名和路由器之间的映射关系</p>
+<p>那我们需要了解：</p>
+<pre><code>self.url_rule_class?
+self.url_map？
+self.view_functions？
+</code></pre>
+<h4 id="self-url-rule-class"><a href="#self-url-rule-class" class="headerlink" title="self.url_rule_class"></a>self.url_rule_class</h4><p><code>Flask</code>类中，定义了：</p>
+<pre><code>url_rule_class = Rule
+</code></pre>
+<p>而这里的<code>Rule</code>是：</p>
+<pre><code>from werkzeug.routing import Rule
+</code></pre>
+<p>导入的。受制于篇幅，可以看下<a href="/2016/12/24/werkzeug%E7%9A%84Rule%E4%BB%8B%E7%BB%8D/" title="werkzeug的Rule介绍">werkzeug的Rule介绍</a>对<code>Rule</code>的介绍。</p>
+<h4 id="self-url-map"><a href="#self-url-map" class="headerlink" title="self.url_map"></a>self.url_map</h4><p><code>Flask</code>类中，定义了：</p>
+<pre><code>self.url_map = Map()
+</code></pre>
+<p>而<code>Map</code>也是从<code>werkzeug</code>中导入的，</p>
+<pre><code>from werkzeug.routing import Map
+</code></pre>
+<p>对<code>Map</code>的详细介绍参考另一篇文章:<a href="/2016/12/26/werkzeug%E7%9A%84Map%E4%BB%8B%E7%BB%8D/" title="werkzeug的Map介绍">werkzeug的Map介绍</a>.</p>
+<p>也就是说，Flask把一个个的Rule保存在一个List(<code>Map</code>的属性<code>_rules</code>)中。</p>
+<h4 id="self-view-functions"><a href="#self-view-functions" class="headerlink" title="self.view_functions"></a>self.view_functions</h4><p><code>self.view_functions</code>最简单，它就是一个<code>dict</code>：</p>
+<pre><code>self.view_functions = &#123;&#125;
+</code></pre>
+<p>它的key是：</p>
+<pre><code>蓝图名称+&#39;.&#39;+处理请求的函数对象的名称
+</code></pre>
+<p>它的value是：</p>
+<pre><code>处理请求的函数对象
+</code></pre>
+<p>到这里为止，我们就知道了在处理请求之前，Flask做了哪些准备。当用户<br>发出Http 请求时， Flask怎么做的呢？</p>
+<h3 id="对请求的匹配"><a href="#对请求的匹配" class="headerlink" title="对请求的匹配"></a>对请求的匹配</h3><p>通过<a href="/2016/12/20/gunicorn%E6%98%AF%E5%A6%82%E4%BD%95%E5%92%8Cflask%E9%80%9A%E4%BF%A1%E7%9A%84/" title="gunicorn是如何和flask通信的">gunicorn是如何和flask通信的</a>,已经知道<code>Flask.wsgi_app(...)</code>是gunicorn和flask app的通信入口。而<code>Flask.wsgi_app(...)</code>的实现如下：</p>
+<pre><code>self.try_trigger_before_first_request_functions()
+try:
+    request_started.send(self)
+    rv = self.preprocess_request()
+    if rv is None:
+        # 请求分发
+        rv = self.dispatch_request()
+except Exception as e:
+    rv = self.handle_user_exception(e)
+response = self.make_response(rv)
+response = self.process_response(response)
+request_finished.send(self, response=response)
+return response
+</code></pre>
+<p>这里， 我们只关心:</p>
+<pre><code>rv = self.dispatch_request()
+</code></pre>
+<p>的实现，因为跟踪此处可以发现Flask对路由的管理过程。看看<code>dispatch_request()</code>的实现：</p>
+<pre><code>    def dispatch_request(self):
+        &quot;&quot;&quot;Does the request dispatching.  Matches the URL and returns the
+        return value of the view or error handler.  This does not have to
+        be a response object.  In order to convert the return value to a
+        proper response object, call :func:`make_response`.
+        &quot;&quot;&quot;
+        # 获得request
+        req = _request_ctx_stack.top.request
+        if req.routing_exception is not None:
+            self.raise_routing_exception(req)
+        rule = req.url_rule
+        # if we provide automatic options for this URL and the
+        # request came with the OPTIONS method, reply automatically
+        if getattr(rule, &#39;provide_automatic_options&#39;, False) \
+           and req.method == &#39;OPTIONS&#39;:
+            return self.make_default_options_response()
+        # otherwise dispatch to the handler for that endpoint
+        # view_args是动态路由参数
+        return self.view_functions[rule.endpoint](**req.view_args)
+        
+</code></pre>
+<p>也就是说，：</p>
+<pre><code>先获得request对象
+去除request对象对应的url_rule
+最后处理请求：self.view_functions[rule.endpoint](**req.view_args)
+</code></pre>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flask/" rel="tag"># flask</a>
+          
+            <a href="/tags/flask%E8%B7%AF%E7%94%B1/" rel="tag"># flask路由</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/20/gunicorn%E6%98%AF%E5%A6%82%E4%BD%95%E5%92%8Cflask%E9%80%9A%E4%BF%A1%E7%9A%84/" rel="next" title="gunicorn是如何和flask通信的">
+                <i class="fa fa-chevron-left"></i> gunicorn是如何和flask通信的
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/24/werkzeug%E7%9A%84Rule%E4%BB%8B%E7%BB%8D/" rel="prev" title="werkzeug的Rule介绍">
+                werkzeug的Rule介绍 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%9C%BA"><span class="nav-number">1.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flask%E7%9A%84%E8%B7%AF%E7%94%B1%E7%AE%A1%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">Flask的路由管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%9D%E5%AD%98%E8%B7%AF%E7%94%B1%E8%A7%84%E5%88%99"><span class="nav-number">2.1.</span> <span class="nav-text">保存路由规则</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#self-url-rule-class"><span class="nav-number">2.1.1.</span> <span class="nav-text">self.url_rule_class</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#self-url-map"><span class="nav-number">2.1.2.</span> <span class="nav-text">self.url_map</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#self-view-functions"><span class="nav-number">2.1.3.</span> <span class="nav-text">self.view_functions</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E8%AF%B7%E6%B1%82%E7%9A%84%E5%8C%B9%E9%85%8D"><span class="nav-number">2.2.</span> <span class="nav-text">对请求的匹配</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

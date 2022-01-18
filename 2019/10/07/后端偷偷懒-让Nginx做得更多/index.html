@@ -1,0 +1,717 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="nginx," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="作为非专业运维的后端，对nginx的使用，多是： 123反向代理&amp;负载均衡处理静态文件请求限制请求&#x2F;连接数 在阅读了《nginx教程从入门到精通》之后，感觉以往的很多业务开发是多余的，完全可以利用nginx来实现。下面对一些后端经常要实现、nginx又可以做的功能进行作结，通过压榨nginx，后端也可以偷偷懒。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="后端偷偷懒,让Nginx做得更多">
+<meta property="og:url" content="http://yoursite.com/2019/10/07/%E5%90%8E%E7%AB%AF%E5%81%B7%E5%81%B7%E6%87%92-%E8%AE%A9Nginx%E5%81%9A%E5%BE%97%E6%9B%B4%E5%A4%9A/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="作为非专业运维的后端，对nginx的使用，多是： 123反向代理&amp;负载均衡处理静态文件请求限制请求&#x2F;连接数 在阅读了《nginx教程从入门到精通》之后，感觉以往的很多业务开发是多余的，完全可以利用nginx来实现。下面对一些后端经常要实现、nginx又可以做的功能进行作结，通过压榨nginx，后端也可以偷偷懒。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-10-07T12:37:48.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:53.231Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="nginx">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/07/后端偷偷懒-让Nginx做得更多/"/>
+
+
+
+
+
+  <title> 后端偷偷懒,让Nginx做得更多 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/07/%E5%90%8E%E7%AB%AF%E5%81%B7%E5%81%B7%E6%87%92-%E8%AE%A9Nginx%E5%81%9A%E5%BE%97%E6%9B%B4%E5%A4%9A/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                后端偷偷懒,让Nginx做得更多
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-07T20:37:48+08:00">
+                2019-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>作为非专业运维的后端，对<code>nginx</code>的使用，多是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">反向代理&amp;负载均衡</span><br><span class="line">处理静态文件请求</span><br><span class="line">限制请求/连接数</span><br></pre></td></tr></table></figure>
+<p>在阅读了<code>《nginx教程从入门到精通》</code>之后，感觉以往的很多业务开发是多余的，完全可以利用<code>nginx</code>来实现。下面对一些后端经常要实现、nginx又可以做的功能进行作结，通过压榨nginx，后端也可以偷偷懒。</p>
+<span id="more"></span>
+
+<p>(不过这里只是说明<code>nginx可以干</code>,至于怎么做、用什么module,需要自己Google)</p>
+<h2 id="动态页面缓存"><a href="#动态页面缓存" class="headerlink" title="动态页面缓存"></a>动态页面缓存</h2><p>为了提高系统性能，后端往往会将动态的页面响应缓存起来，建立<code>&lt;路由, 响应&gt;</code>的映射关系。</p>
+<p>而nginx也能解决该类问题。后端只需要关心页面的渲染即可。</p>
+<h2 id="生成视频封面缩略图"><a href="#生成视频封面缩略图" class="headerlink" title="生成视频封面缩略图"></a>生成视频封面缩略图</h2><p>在诸多的视频网站上，也经常看到视频有个封面的图片信息。这些肯定不是人工截图、再人工配置上去的。</p>
+<p>后端的程序可以给每个视频预先生成。</p>
+<p>nginx也可以实现该功能。</p>
+<p>至于在哪里生成缩略图、是否预先生成，取决于业务场景、性能要求。</p>
+<h2 id="计算文件md5"><a href="#计算文件md5" class="headerlink" title="计算文件md5"></a>计算文件md5</h2><p>对于文件上传功能，后端也往往将文件流保存到本地后，再分片计算文件的MD5。</p>
+<p>如果利用NGINX生成文件的MD5、并把该值存储到<code>Request=Header</code>中，那么，后端就更方便了。</p>
+<h2 id="生成缩略图"><a href="#生成缩略图" class="headerlink" title="生成缩略图"></a>生成缩略图</h2><p>用户多会上传一些高清大图，如：<code>游戏Logo</code>、<code>营业证书</code>等。如果将这些大图返回给页面，会导致图片加载慢的问题。</p>
+<p>为了解决方案，后端可以利用<code>PILLOW</code>等库，生成一个指定大小的缩略图，并保存起来，提高了页面的加载速度。但也存在问题:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 需要维护缩略图</span><br><span class="line">2. 大小固定，需求有变动，以往生成的图片都不能满足需求</span><br></pre></td></tr></table></figure>
+
+<p>而<code>nginx</code>的相关模块支持在请求原始图片时，生成指定长、宽的缩略图，可以避免上述问题。</p>
+<p>但是，即时生成缩略图，是一种<code>CPU密集型</code>的操作。所以，需要把生成的缩略图缓存起来才行。</p>
+<h2 id="下载请求鉴权认证"><a href="#下载请求鉴权认证" class="headerlink" title="下载请求鉴权认证"></a>下载请求鉴权认证</h2><h2 id="直接运行server端的脚本"><a href="#直接运行server端的脚本" class="headerlink" title="直接运行server端的脚本"></a>直接运行server端的脚本</h2><p>在一些简单的应用中，需要运行一下server端的shell等可执行脚本，并把执行结果返回给浏览器。</p>
+<p>后端往往通过python/java等编程语言，fork子进程，调用可执行脚本、输出结果。</p>
+<p>而nginx的模块，也支持调用shell等可执行结果。可以省去了后端的开发过程。</p>
+<h2 id="根据IP获取Location"><a href="#根据IP获取Location" class="headerlink" title="根据IP获取Location"></a>根据IP获取Location</h2><p>部分需求场景中，需要根据访客的IP，获取访客的位置。</p>
+<p>后端也往往从request拿到IP之后，再调用第三方的接口，获取该IP对应的Location。</p>
+<p>可以直接利用nginx的相关插件，根据IP获取Location信息、把Location信息放进<code>Request=Header</code>中，而后端直接拿到该值即可。</p>
+<p>该方案是否可行，大部分取决于:</p>
+<pre><code>nginx插件所用的第三方&lt;IP、Location&gt;数据库，是否满足你的需要。
+</code></pre>
+<h2 id="publish-subscribe"><a href="#publish-subscribe" class="headerlink" title="publish/subscribe"></a>publish/subscribe</h2><p>后端开发，会比较熟悉<code>REDIS</code>的<code>publish/subscribe</code>模式.</p>
+<p>但是，在web应用层面，如果后端要实现相关的<code>pub/sub</code>模式，可能还要利用<code>websocket</code>的相关库，来实现相关的API，有些繁琐。</p>
+<p><code>publish/subscribe</code>模式下，可以把nginx当成web层面的<code>Redis</code>，轻松实现消息的推送。</p>
+<h2 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h2><p>文件上传，是常见的web功能需求。</p>
+<p>后端可以直接处理文件上传，但要处理等诸多问题：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">文件的临时存储</span><br><span class="line">上传异常、删除临时文件</span><br><span class="line">上传限速</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>而这些事，nginx也可以处理；后端只需要暴露结果，接受nginx的上传结果即可。</p>
+<h2 id="防xss"><a href="#防xss" class="headerlink" title="防xss"></a>防xss</h2><p>XSS攻击非常常见。后端开发在业务的时候，也需要注意防止XSS攻击的问题。<br>然而，对于互联网上众多的老项目、突然爆出的XSS漏洞等问题，通过修改后端来防止XSS攻击，可能已经来不及了……</p>
+<p>而可以利用nginx的防XSS功能，及时打开防御的大门……</p>
+<h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><ol>
+<li>《nginx教程从入门到精通》</li>
+<li><a target="_blank" rel="noopener" href="https://www.nginx.com/resources/wiki/modules/">NGINX 3rd Party Modules</a></li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nginx/" rel="tag"># nginx</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/07/%E5%89%8D%E6%AE%B5%E6%97%B6%E9%97%B4%E7%9A%84%E5%81%9C%E6%9B%B4%E8%AF%B4%E6%98%8E/" rel="next" title="前段时间的停更说明">
+                <i class="fa fa-chevron-left"></i> 前段时间的停更说明
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/07/%E5%88%9B%E5%BB%BApython%E7%A9%BA%E5%AF%B9%E8%B1%A1%E6%96%B9%E6%B3%95%E7%9A%84%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83-%E5%88%86%E6%9E%90/" rel="prev" title="创建python空对象方法的性能比较&分析">
+                创建python空对象方法的性能比较&分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E9%A1%B5%E9%9D%A2%E7%BC%93%E5%AD%98"><span class="nav-number">1.</span> <span class="nav-text">动态页面缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E8%A7%86%E9%A2%91%E5%B0%81%E9%9D%A2%E7%BC%A9%E7%95%A5%E5%9B%BE"><span class="nav-number">2.</span> <span class="nav-text">生成视频封面缩略图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%96%87%E4%BB%B6md5"><span class="nav-number">3.</span> <span class="nav-text">计算文件md5</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E7%BC%A9%E7%95%A5%E5%9B%BE"><span class="nav-number">4.</span> <span class="nav-text">生成缩略图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E8%AF%B7%E6%B1%82%E9%89%B4%E6%9D%83%E8%AE%A4%E8%AF%81"><span class="nav-number">5.</span> <span class="nav-text">下载请求鉴权认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%B4%E6%8E%A5%E8%BF%90%E8%A1%8Cserver%E7%AB%AF%E7%9A%84%E8%84%9A%E6%9C%AC"><span class="nav-number">6.</span> <span class="nav-text">直接运行server端的脚本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AEIP%E8%8E%B7%E5%8F%96Location"><span class="nav-number">7.</span> <span class="nav-text">根据IP获取Location</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#publish-subscribe"><span class="nav-number">8.</span> <span class="nav-text">publish&#x2F;subscribe</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0"><span class="nav-number">9.</span> <span class="nav-text">文件上传</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%B2xss"><span class="nav-number">10.</span> <span class="nav-text">防xss</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">11.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

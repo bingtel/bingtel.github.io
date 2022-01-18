@@ -1,0 +1,687 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sqlalchemy," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="sqlalchemySQLAlchemy是Python中提供SQL工具包及对象关系映射(ORM), 也是比较成熟的ORM。学习的难点就是太重、学习曲线太高，但是入门很简单。这里记录一下,方便日后的使用。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sqlalchemy的基本操作">
+<meta property="og:url" content="http://yoursite.com/2016/12/14/sqlalchemy%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="sqlalchemySQLAlchemy是Python中提供SQL工具包及对象关系映射(ORM), 也是比较成熟的ORM。学习的难点就是太重、学习曲线太高，但是入门很简单。这里记录一下,方便日后的使用。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-14T13:25:31.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:53.090Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="sqlalchemy">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/14/sqlalchemy的基本操作/"/>
+
+
+
+
+
+  <title> sqlalchemy的基本操作 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/14/sqlalchemy%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                sqlalchemy的基本操作
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-14T21:25:31+08:00">
+                2016-12-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="sqlalchemy"><a href="#sqlalchemy" class="headerlink" title="sqlalchemy"></a>sqlalchemy</h2><p>SQLAlchemy是Python中提供SQL工具包及对象关系映射(ORM), 也是比较成熟的ORM。<br>学习的难点就是<code>太重</code>、学习曲线太高，但是入门很简单。<br>这里记录一下,方便日后的使用。</p>
+<span id="more"></span>
+
+
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><h3 id="样例"><a href="#样例" class="headerlink" title="样例"></a>样例</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"># coding: utf-8</span><br><span class="line">from sqlalchemy import Column, String, create_engine, Integer</span><br><span class="line">from sqlalchemy.orm import sessionmaker</span><br><span class="line">from sqlalchemy.ext.declarative import declarative_base</span><br><span class="line"></span><br><span class="line"># 创建对象的基类:</span><br><span class="line">Base = declarative_base()</span><br><span class="line"></span><br><span class="line"># 定义User对象:</span><br><span class="line">class User(Base):</span><br><span class="line">    # 表的名字:</span><br><span class="line">    __tablename__ = &#x27;User&#x27;</span><br><span class="line">    # 表的结构:</span><br><span class="line">    uid = Column(Integer, primary_key=True)</span><br><span class="line">    nickname = Column(String(20))</span><br><span class="line">    email = Column(String(20))</span><br><span class="line"></span><br><span class="line">    def __repr__(self):</span><br><span class="line">        return &#x27;&lt;uid=&#123;0.uid&#125;, nickname=&#123;0.nickname&#125;, email=&#123;0.email&#125;&gt;&#x27;.format(self)</span><br><span class="line"></span><br><span class="line"># 初始化数据库连接:</span><br><span class="line">engine = create_engine(&#x27;mysql+pymysql://root:passwd@localhost:3306/test&#x27;)</span><br><span class="line"></span><br><span class="line"># 创建表</span><br><span class="line"># Base.metadata.create_all(engine)</span><br><span class="line"></span><br><span class="line"># 创建DBSession类型:</span><br><span class="line">DBSession = sessionmaker(bind=engine)</span><br><span class="line"># 新建数据库连接</span><br><span class="line">session = DBSession()</span><br><span class="line">try:</span><br><span class="line">    user = User(nickname=&#x27;t&#x27;, email=&#x27;www@qq.com&#x27;)</span><br><span class="line">    session.add(user)</span><br><span class="line">    # 1/0</span><br><span class="line">except:</span><br><span class="line">    session.rollback()</span><br><span class="line">else:</span><br><span class="line">    session.commit()</span><br><span class="line"></span><br><span class="line"># 获取User表的所有行、所有字段、并按照uid排序</span><br><span class="line">query_users = session.query(User).order_by(User.uid)</span><br><span class="line">print query_users</span><br><span class="line">print query_users.all()</span><br><span class="line"></span><br><span class="line"># 只返回部分字段</span><br><span class="line">users = session.query(User.nickname, User.email).order_by(User.uid).all()</span><br><span class="line">print users</span><br><span class="line"></span><br><span class="line"># 过滤出nickname的值为&#x27;Edwardo&#x27;, &#x27;fakeuser&#x27;</span><br><span class="line"># users = session.query(User).filter(User.nickname.in_([&#x27;Edwardo&#x27;, &#x27;fakeuser&#x27;])).all()</span><br><span class="line"></span><br><span class="line"># 过滤出nickname的为&#x27;Edwardo&#x27;的记录</span><br><span class="line">users = session.query(User).filter(User.nickname==&#x27;Edwardo&#x27;).all()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="Query对象"><a href="#Query对象" class="headerlink" title="Query对象"></a>Query对象</h3><p>session.query(…)会返回一个Query对象,支持:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># 等值过滤</span><br><span class="line">query.filter(User.name == &#x27;ed&#x27;)</span><br><span class="line">query.filter(User.name != &#x27;ed&#x27;)</span><br><span class="line">query.filter(User.name.like(&#x27;%ed%&#x27;))</span><br><span class="line"></span><br><span class="line"># IN</span><br><span class="line">query.filter(User.name.in_([&#x27;ed&#x27;, &#x27;wendy&#x27;, &#x27;jack&#x27;]))</span><br><span class="line"></span><br><span class="line"># 带子查询的IN</span><br><span class="line">query.filter(User.name.in_(</span><br><span class="line">        session.query(User.name).filter(User.name.like(&#x27;%ed%&#x27;))</span><br><span class="line">))</span><br><span class="line"></span><br><span class="line"># NOT IN</span><br><span class="line">query.filter(~User.name.in_([&#x27;ed&#x27;, &#x27;wendy&#x27;, &#x27;jack&#x27;]))</span><br><span class="line"></span><br><span class="line"># IS NULL</span><br><span class="line">query.filter(User.name == None)</span><br><span class="line"># for pep8</span><br><span class="line">query.filter(User.name.is_(None))</span><br><span class="line"></span><br><span class="line"># IS NOT NULL</span><br><span class="line">query.filter(User.name != None)</span><br><span class="line">query.filter(User.name.isnot(None))</span><br><span class="line"></span><br><span class="line"># AND</span><br><span class="line"># 使用 and_()</span><br><span class="line">from sqlalchemy import and_</span><br><span class="line">query.filter(and_(User.name == &#x27;ed&#x27;, User.fullname == &#x27;Ed Jones&#x27;))</span><br><span class="line">query.filter(User.name == &#x27;ed&#x27;, User.fullname == &#x27;Ed Jones&#x27;)</span><br><span class="line">query.filter(User.name == &#x27;ed&#x27;).filter(User.fullname == &#x27;Ed Jones&#x27;)</span><br><span class="line"></span><br><span class="line"># OR</span><br><span class="line">from sqlalchemy import or_</span><br><span class="line">query.filter(or_(User.name == &#x27;ed&#x27;, User.name == &#x27;wendy&#x27;))</span><br><span class="line"></span><br><span class="line"># match</span><br><span class="line"># match() uses a database-specific MATCH or CONTAINS function; </span><br><span class="line"># its behavior will vary by backend and is not available on some backends</span><br><span class="line"># such as SQLite. </span><br><span class="line">query.filter(User.name.match(&#x27;wendy&#x27;))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="返回结果"><a href="#返回结果" class="headerlink" title="返回结果"></a>返回结果</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 返回列表 all()</span><br><span class="line">query.all()</span><br><span class="line"></span><br><span class="line"># 只返回第一个</span><br><span class="line">query.first()</span><br><span class="line"></span><br><span class="line"># one(): 当结果集有且只有一条时，使用该方法；否则(即多个记录或者没有记录)报错</span><br><span class="line">user = query.one()</span><br><span class="line"></span><br><span class="line"># one_or_none(): 弥补one()的不足</span><br><span class="line"></span><br><span class="line"># scalar()</span><br><span class="line"># 调用 one() method, and upon success returns the first column of the row:</span><br><span class="line">query.scalar()</span><br><span class="line"></span><br><span class="line"># count()返回记录总数</span><br></pre></td></tr></table></figure>
+<h3 id="使用raw-sql"><a href="#使用raw-sql" class="headerlink" title="使用raw sql"></a>使用raw sql</h3><p>可以直接使用engine对象来执行sql,获得结果(默认)是dict类型.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">r = engine.execute(&#x27;SHOW DATABASES&#x27;)</span><br><span class="line">print dir(r)</span><br><span class="line">print r.fetchall()</span><br><span class="line"># print dir(engine)</span><br><span class="line">print engine.echo</span><br><span class="line">print engine.dialect</span><br><span class="line">print engine.table_names()</span><br><span class="line">print engine.url</span><br></pre></td></tr></table></figure>
+
+<h3 id="关于外键关联"><a href="#关于外键关联" class="headerlink" title="关于外键关联"></a>关于外键关联</h3><p>不喜欢在表之间建立外键的关联关系，主要是因为开发过程中,经常会对数据删、改，<br>收到了mysql的外键约束， 很麻烦。<br>可以通过raw sql来获取关联的结果集。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sqlalchemy/" rel="tag"># sqlalchemy</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/13/idea%E5%92%8C%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%ADpython%E8%B7%AF%E5%BE%84%E7%9A%84%E6%90%9C%E7%B4%A2%E9%97%AE%E9%A2%98/" rel="next" title="idea和命令行中python路径的搜索问题">
+                <i class="fa fa-chevron-left"></i> idea和命令行中python路径的搜索问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/15/flask%E7%9A%84RESTful%E6%8E%A5%E5%8F%A3%E7%A4%BA%E4%BE%8B-%E5%AE%9E%E7%8E%B0%E6%96%87%E4%BB%B6%E7%9A%84%E4%B8%8A%E4%BC%A0%E3%80%81%E4%B8%8B%E8%BD%BD%E3%80%81%E5%88%A0%E9%99%A4/" rel="prev" title="flask的RESTful接口示例-实现文件的上传、下载、删除">
+                flask的RESTful接口示例-实现文件的上传、下载、删除 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sqlalchemy"><span class="nav-number">1.</span> <span class="nav-text">sqlalchemy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B7%E4%BE%8B"><span class="nav-number">2.1.</span> <span class="nav-text">样例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Query%E5%AF%B9%E8%B1%A1"><span class="nav-number">2.2.</span> <span class="nav-text">Query对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C"><span class="nav-number">2.3.</span> <span class="nav-text">返回结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8raw-sql"><span class="nav-number">2.4.</span> <span class="nav-text">使用raw sql</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E5%A4%96%E9%94%AE%E5%85%B3%E8%81%94"><span class="nav-number">2.5.</span> <span class="nav-text">关于外键关联</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

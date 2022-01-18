@@ -1,0 +1,775 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="python+base64模块,base64编码," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="问题项目开发中， 需要开发一个接口： 对参数进行base64编码后,再和某个数据库字段进行**等值(&#x3D;)**匹配。开发中，使用了">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python base64模块学习">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/python-base64%E6%A8%A1%E5%9D%97%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="问题项目开发中， 需要开发一个接口： 对参数进行base64编码后,再和某个数据库字段进行**等值(&#x3D;)**匹配。开发中，使用了">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:44:45.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.866Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="python+base64模块">
+<meta property="article:tag" content="base64编码">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/python-base64模块学习/"/>
+
+
+
+
+
+  <title> python base64模块学习 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/python-base64%E6%A8%A1%E5%9D%97%E5%AD%A6%E4%B9%A0/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                python base64模块学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:44:45+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>项目开发中， 需要开发一个接口： 对参数进行base64编码后,再和某个数据库字段进行**等值(=)**匹配。开发中，使用了</p>
+<span id="more"></span>
+
+<pre><code>import base64
+base64.encodestring(param)
+</code></pre>
+<p>对参数进行编码， 可是老是和数据库记录匹配失败，一度怀疑sql写错了， 结果发现是对**encodestring()**的使用错误……囧。</p>
+<h3 id="错误原因"><a href="#错误原因" class="headerlink" title="错误原因"></a>错误原因</h3><p>使用<strong>encodestring</strong>对字符串进行编码， 会返回包含’\n’的字符串，而数据库中的记录，是不包含’\n’的；</p>
+<p>如果想获得不包含’\n’的字符串， 应该使用</p>
+<pre><code>base64.b64encode(...)
+</code></pre>
+<h3 id="Base64介绍"><a href="#Base64介绍" class="headerlink" title="Base64介绍"></a>Base64介绍</h3><p>Base64，即选出64个字符</p>
+<pre><code>a-z、A-Z、0-9、&quot;+&quot;、&quot;/&quot;
+</code></pre>
+<p>作为基本字符集（加上作为垫字的”=”，实际上是65个字符）, 如下表(顺序可变， 只要编码和解码使用同一套字符集即可)。</p>
+<pre><code>0　A　　17　R　　　34　i　　　51　z
+1　B　　18　S　　　35　j　　　52　0
+2　C　　19　T　　　36　k　　　53　1
+3　D　　20　U　　　37　l　　　54　2
+4　E　　21　V　　　38　m　　　55　3
+5　F　　22　W　　　39　n　　　56　4
+6　G　　23　X　　　40　o　　　57　5
+7　H　　24　Y　　　41　p　　　58　6
+8　I　　　25　Z　　　42　q　　　59　7
+9　J　　26　a　　　43　r　　　60　8
+10　K　　27　b　　　44　s　　　61　9
+11　L　　28　c　　　45　t　　　62　+
+12　M　　29　d　　　46　u　　　63　/
+13　N　　30　e　　　47　v
+14　O　　31　f　　　48　w　　　
+15　P　　32　g　　　49　x
+16　Q　　33　h　　　50　y
+</code></pre>
+<p>然后，把其他符号都转换成该字符集中的字符。转换步骤可以分为：</p>
+<pre><code>1、将每三个字节作为一组，共24个bit位。
+2、将24个二进制位分为四组，每个组有6个bit位。
+3、在每组前面加两个00，扩展成32个bit位，共四个字节。
+4、根据上述字符集，得到扩展后的每个字节的对应符号，即Base64的编码值。
+</code></pre>
+<p>如果字节数不足三，则这样处理：</p>
+<pre><code>1、二个字节的情况：将这16个二进制位，按照上面的规则，转成三组，
+   最后一组除了前面加两个0以外，后面也要加两个0。这样得到一个三位的Base64编码，再在末尾补上一个&quot;=&quot;号。
+
+2、一个字节的情况：将这8个二进制位，按照上面的规则转成二组，
+   最后一组除了前面加二个0以外，后面再加4个0。这样得到一个二位的Base64编码，再在末尾补上两个&quot;=&quot;号。
+</code></pre>
+<p>那汉字如何进行Base64编码呢？以”王”字为例，步骤如下(<strong>注意</strong>，汉字本身可以有多种编码，比如utf-8、gbk等，每一种编码的Base64对应值都不一样。下面的例子以utf-8为例。)：</p>
+<pre><code>&quot;王&quot;的utf-8编码为E78E8B，写成二进制就是三字节的&quot;11100111 10001110 10001011&quot;。
+将这24位的二进制字符串，按照第3节中的规则，转换成四组一共32位的二进制值
+&quot;00111001 0011100 00111010 00001011&quot;，相应的十进制数为:57, 56, 58, 11
+它们对应的Base64值就为5、4、6、L。所以，&quot;王&quot;（utf-8编码）的Base64值就是546L。
+</code></pre>
+<h3 id="base64-模块学习"><a href="#base64-模块学习" class="headerlink" title="base64 模块学习"></a>base64 模块学习</h3><p>激活python环境， 可以查看base64模块的相关API：</p>
+<pre><code>&gt;import base64
+&gt;help(base64)
+</code></pre>
+<p>base64的方法对有：</p>
+<p>1、 b16encode(…)和b16decode(…)</p>
+<p>函数名中的’16’表示字符集有16个字符。</p>
+<pre><code>b16encode(s) 进行编码
+
+b16decode(s, casefold=False), s是要被解码的字符串, casefold表示是否接收小写字母作为输入;
+返回解码后的字符串，当s中包含非字母表中的字符时，抛出TypeError。
+</code></pre>
+<p>2、 b32encode(…)和b32decode(…)</p>
+<p>函数名中的’32’表示字符集有32个字符。</p>
+<pre><code>b32encode(s) 进行编码
+
+b32decode(s, casefold=False, map01=None), s和casefold的意义，和b16decode(...)相同;
+值得注意的是参数map01， RFC 3548中， 允许把数字0映射成字符&#39;0&#39;，而把数字1映射成字符&#39;1&#39;或者字符&#39;L&#39;，
+当map01不是None时， 数字1就被映射成该值， 默认情况下， 0和1不应该出现再s中。
+返回解码后的字符串，当s中包含非字母表中的字符时，抛出TypeError。
+</code></pre>
+<p>3、b64encode(…)和b64decode(…)</p>
+<p>b64encode(s, altchars=None) s是要编码的字符串，而alterchars不为None时，必须是长度&gt;=2的字符串(用于替换 ‘+’、’=’， 多余的字符会被忽略)。</p>
+<p>b64decode(s, altchars=None)， 参数的意义和b64encode(…)的相同。</p>
+<p>4、encode(…)和decode(…)</p>
+<pre><code>encode(input, output) 用于编码文件
+
+decode(input, output)  用于解码文件
+</code></pre>
+<p>5、encodestring(…)和decodestring(…)</p>
+<pre><code>encodestring(s) 编码成多行字符串(返回的字符串中，会包含&#39;\n&#39;)
+
+decodestring(s) 解码字符串
+</code></pre>
+<p>6、standard_b64encode(…)和standard_b64decode(…)</p>
+<pre><code>standard_b64encode(s)  使用标准的Base64字符集(上文列出的)进行编码
+
+standard_b64decode(s)  使用标准的Base64字符集(上文列出的)进行解码
+</code></pre>
+<p>7、urlsafe_b64encode(…)和urlsafe_b64decode(…)</p>
+<pre><code>urlsafe_b64encode(s) 使用对文件系统、url安全的字符集进行编码(使用&#39;-&#39;代替&#39;+&#39;, 使用&#39;_&#39;代替&#39;=&#39;)
+
+urlsafe_b64decode(s) 使用对文件系统、url安全的字符集进行解码(使用&#39;-&#39;代替&#39;+&#39;, 使用&#39;_&#39;代替&#39;=&#39;)
+</code></pre>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2008/06/base64.html">Base64笔记</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python-base64%E6%A8%A1%E5%9D%97/" rel="tag"># python+base64模块</a>
+          
+            <a href="/tags/base64%E7%BC%96%E7%A0%81/" rel="tag"># base64编码</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/flask-%E7%94%9F%E6%88%90excel%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6/" rel="next" title="flask-生成excel下载文件">
+                <i class="fa fa-chevron-left"></i> flask-生成excel下载文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/Python-Decimal%E7%9A%84%E7%B2%BE%E7%A1%AE%E5%BA%A6%E9%97%AE%E9%A2%98/" rel="prev" title="Python Decimal的精确度问题">
+                Python Decimal的精确度问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E5%8E%9F%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">错误原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Base64%E4%BB%8B%E7%BB%8D"><span class="nav-number">3.</span> <span class="nav-text">Base64介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#base64-%E6%A8%A1%E5%9D%97%E5%AD%A6%E4%B9%A0"><span class="nav-number">4.</span> <span class="nav-text">base64 模块学习</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

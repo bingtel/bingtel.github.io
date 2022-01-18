@@ -1,0 +1,751 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn,flask,wsgi," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="问题flask是在对werkzeug简单封装的基础上形成的。作为一个轻量级的web框架，flask容易上手，学习和进阶曲线不陡峭，是Python Web框架入门的首选(自己觉得)。flask自带了一个HTTP Server用于开发和调试， 如:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gunicorn是如何和flask通信的">
+<meta property="og:url" content="http://yoursite.com/2016/12/20/gunicorn%E6%98%AF%E5%A6%82%E4%BD%95%E5%92%8Cflask%E9%80%9A%E4%BF%A1%E7%9A%84/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="问题flask是在对werkzeug简单封装的基础上形成的。作为一个轻量级的web框架，flask容易上手，学习和进阶曲线不陡峭，是Python Web框架入门的首选(自己觉得)。flask自带了一个HTTP Server用于开发和调试， 如:">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-20T12:39:05.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.720Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn">
+<meta property="article:tag" content="flask">
+<meta property="article:tag" content="wsgi">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/20/gunicorn是如何和flask通信的/"/>
+
+
+
+
+
+  <title> gunicorn是如何和flask通信的 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/20/gunicorn%E6%98%AF%E5%A6%82%E4%BD%95%E5%92%8Cflask%E9%80%9A%E4%BF%A1%E7%9A%84/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                gunicorn是如何和flask通信的
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-20T20:39:05+08:00">
+                2016-12-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>flask是在对werkzeug简单封装的基础上形成的。作为一个轻量级的web框架，<br>flask容易上手，学习和进阶曲线不陡峭，是Python Web框架入门的首选(自己觉得)。<br>flask自带了一个HTTP Server用于开发和调试， 如:</p>
+<span id="more"></span>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from flask import Flask</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def hello():</span><br><span class="line">    return &#x27;Hello&#x27;</span><br><span class="line">    </span><br><span class="line">if __name__ == &#x27;__main__&#x27;:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+<p>但是，受制于安全、性能等问题，该Server不能用于生产环境。<br>生产环境中部署flask等WSGI常用的组合是：</p>
+<pre><code>nginx + gunicorn + application(flask应用等)
+</code></pre>
+<p>gunicorn是一款广受欢迎的WSGI服务器，可以用于部署flask应用。<br>那么， gunicorn收到请求之后，使如何对请求进行解析并发给flask应用的呢?<br>让我们从代码中一睹究竟。</p>
+<h2 id="代码跟踪"><a href="#代码跟踪" class="headerlink" title="代码跟踪"></a>代码跟踪</h2><p>“柿子先捡软的捏”，flask代码比较简单，就先看flask的代码。</p>
+<h3 id="flask代码"><a href="#flask代码" class="headerlink" title="flask代码"></a>flask代码</h3><p>既然是探究”gunicorn是如何和flask应用进行通信”， 那么我们就来看一下flask中<br>用于创建应用的<code>Flask</code>类。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line">class Flask(_PackageBoundObject):</span><br><span class="line">    ...</span><br><span class="line">    def dispatch_request(self):</span><br><span class="line">        &quot;&quot;&quot;Does the request dispatching.  Matches the URL and returns the</span><br><span class="line">        return value of the view or error handler.  This does not have to</span><br><span class="line">        be a response object.  In order to convert the return value to a</span><br><span class="line">        proper response object, call :func:`make_response`.</span><br><span class="line"></span><br><span class="line">        .. versionchanged:: 0.7</span><br><span class="line">           This no longer does the exception handling, this code was</span><br><span class="line">           moved to the new :meth:`full_dispatch_request`.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        req = _request_ctx_stack.top.request</span><br><span class="line">        if req.routing_exception is not None:</span><br><span class="line">            self.raise_routing_exception(req)</span><br><span class="line">        rule = req.url_rule</span><br><span class="line">        # if we provide automatic options for this URL and the</span><br><span class="line">        # request came with the OPTIONS method, reply automatically</span><br><span class="line">        if getattr(rule, &#x27;provide_automatic_options&#x27;, False) \</span><br><span class="line">           and req.method == &#x27;OPTIONS&#x27;:</span><br><span class="line">            return self.make_default_options_response()</span><br><span class="line">        # otherwise dispatch to the handler for that endpoint</span><br><span class="line">        # view_args是动态路由参数</span><br><span class="line">        return self.view_functions[rule.endpoint](**req.view_args)</span><br><span class="line"></span><br><span class="line">    def full_dispatch_request(self):</span><br><span class="line">        &quot;&quot;&quot;Dispatches the request and on top of that performs request</span><br><span class="line">        pre and postprocessing as well as HTTP exception catching and</span><br><span class="line">        error handling.</span><br><span class="line"></span><br><span class="line">        .. versionadded:: 0.7</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        self.try_trigger_before_first_request_functions()</span><br><span class="line">        try:</span><br><span class="line">            request_started.send(self)</span><br><span class="line">            rv = self.preprocess_request()</span><br><span class="line">            if rv is None:</span><br><span class="line">                rv = self.dispatch_request()</span><br><span class="line">        except Exception as e:</span><br><span class="line">            rv = self.handle_user_exception(e)</span><br><span class="line">        response = self.make_response(rv)</span><br><span class="line">        response = self.process_response(response)</span><br><span class="line">        request_finished.send(self, response=response)</span><br><span class="line">        return response</span><br><span class="line"></span><br><span class="line">    def wsgi_app(self, environ, start_response):</span><br><span class="line">        &quot;&quot;&quot;The actual WSGI application.  This is not implemented in</span><br><span class="line">        `__call__` so that middlewares can be applied without losing a</span><br><span class="line">        reference to the class.  So instead of doing this::</span><br><span class="line"></span><br><span class="line">            app = MyMiddleware(app)</span><br><span class="line"></span><br><span class="line">        It&#x27;s a better idea to do this instead::</span><br><span class="line"></span><br><span class="line">            app.wsgi_app = MyMiddleware(app.wsgi_app)</span><br><span class="line"></span><br><span class="line">        Then you still have the original application object around and</span><br><span class="line">        can continue to call methods on it.</span><br><span class="line"></span><br><span class="line">        .. versionchanged:: 0.7</span><br><span class="line">           The behavior of the before and after request callbacks was changed</span><br><span class="line">           under error conditions and a new callback was added that will</span><br><span class="line">           always execute at the end of the request, independent on if an</span><br><span class="line">           error occurred or not.  See :ref:`callbacks-and-errors`.</span><br><span class="line"></span><br><span class="line">        :param environ: a WSGI environment</span><br><span class="line">        :param start_response: a callable accepting a status code,</span><br><span class="line">                               a list of headers and an optional</span><br><span class="line">                               exception context to start the response</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        ctx = self.request_context(environ)</span><br><span class="line">        ctx.push()</span><br><span class="line">        error = None</span><br><span class="line">        try:</span><br><span class="line">            try:</span><br><span class="line">                response = self.full_dispatch_request()</span><br><span class="line">            except Exception as e:</span><br><span class="line">                error = e</span><br><span class="line">                response = self.make_response(self.handle_exception(e))</span><br><span class="line">            return response(environ, start_response)</span><br><span class="line">        finally:</span><br><span class="line">            if self.should_ignore_error(error):</span><br><span class="line">                error = None</span><br><span class="line">            ctx.auto_pop(error)</span><br><span class="line"></span><br><span class="line">    def __call__(self, environ, start_response):</span><br><span class="line">        &quot;&quot;&quot;Shortcut for :attr:`wsgi_app`.&quot;&quot;&quot;</span><br><span class="line">        # gunicorn会调用该方法</span><br><span class="line">        return self.wsgi_app(environ, start_response)</span><br></pre></td></tr></table></figure>
+<p><code>Flask</code>的代码有1000+行，为了简单起见，我们只关注:</p>
+<pre><code>wsgi_app(self, environ, start_response)
+full_dispatch_request(self)
+dispatch_request(self)
+__call__(self, environ, start_response)
+</code></pre>
+<p>这四个方法，这四个方法的用途分别是什么呢?</p>
+<ol>
+<li><p>wsgi_app(…)</p>
+<p> flask支持wsgi协议，该方法是gunicorn等中间件和flask通信的间接入口(直接入口是__call__()，下面会说)</p>
+</li>
+<li><p>full_dispatch_request(…)</p>
+<p> 用于分发请求，包括在请求被处理前执行的操作、处理请求、返回响应、处理响应等</p>
+</li>
+<li><p>dispatch_request(…)</p>
+<p> 分发请求并处理请求</p>
+</li>
+</ol>
+<p>4） __call__(…)</p>
+<pre><code>是gunicorn等中间件和flask通信的直接入口, 比如声明了: app = Flask(__name__), 那么gunicorn会通过
+&quot;app(...)&quot;的方式来把请求的参数信息发给flask应用。
+</code></pre>
+<p>需要记住<strong>此处<code>__call__</code>的用法</strong>，下面去跟踪调试gunicorn代码。</p>
+<h3 id="gunicorn代码跟踪"><a href="#gunicorn代码跟踪" class="headerlink" title="gunicorn代码跟踪"></a>gunicorn代码跟踪</h3><p>如何跟踪gunicorn代码，请参考文章:<a target="_blank" rel="noopener" href="http://www.bingtel.wang/2016/12/03/%E8%BF%90%E8%A1%8CGunicorn%E6%BA%90%E7%A0%81/">运行Gunicorn源码</a></p>
+<p>gunicorn的运行轨迹请参考文章: <a target="_blank" rel="noopener" href="http://www.bingtel.wang/2016/12/03/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E4%B8%80-%E2%80%94%E2%80%94Gunicorn%E7%9A%84%E6%95%B4%E4%BD%93%E8%BF%90%E8%A1%8C%E8%BD%A8%E8%BF%B9/">Gunicorn源码阅读与分析(一)——Gunicorn的整体运行轨迹</a></p>
+<h3 id="gunicorn和flask通信的代码"><a href="#gunicorn和flask通信的代码" class="headerlink" title="gunicorn和flask通信的代码"></a>gunicorn和flask通信的代码</h3><p>gunicorn是”主-从”模式，工作者进程用于接收用户请求并通知flask应用处理，<br>所以是工作者进程和flask通信的。<br>gunicorn支持多种工作者进程，这里以<code>Sync</code>工作者为例，介绍一下和flask的通信过程。</p>
+<p>假设以：<br>    # debug_flask是声明app = Flask(<strong>name</strong>)的.py文件<br>    gunicorn  debug_flask:app</p>
+<p>启动flask应用，那么gunicorn会：</p>
+<ol>
+<li>声明一个<code>WSGIApplication</code>对象，</li>
+</ol>
+<ol>
+<li>该对象包含一个<code>init()</code>方法，在该方法中，有一句代码很关键: <code>self.app_uri = args[0]</code><br>此时， <code>self.app_uri</code>的值是<code>debug_flask:app</code>, 因为我们是通过<code>gunicorn  debug_flask:app</code><br>来启动应用的。也就是说，<code>self.app_uri</code>保存的是flask应用对象的位置。</li>
+<li>该对象包含一个<code>load_wsgiapp(self)</code>方法，该方法通过<code>util.import_app(self.app_uri)</code>来加载<br>flask应用对象。</li>
+<li><code>WSGIApplication</code>对象<strong>调用</strong><code>run()</code>方法来启动服务器。由于<code>WSGIApplication</code>是<code>Application</code>类的子类，而<code>run()</code>是在<code>Application</code>中定义的，所以执行的是<code>Application</code>的<code>run()</code>方法。</li>
+</ol>
+<ol start="2">
+<li><code>Application</code>是<code>BaseApplication</code>的子类，在<code>Application</code>的<code>run()</code>方法会去调用<code>BaseApplication</code>的<code>run()</code>方法：</li>
+</ol>
+<ol>
+<li><code>BaseApplication</code>中定义了一个<code>wsgi(self)</code>方法， 定义如下：<br> def wsgi(self):<pre><code> if self.callable is None:
+     self.callable = self.load()
+ return self.callable
+</code></pre>
+也就是说，它会<strong>返回flask应用对象</strong>(很重要)。</li>
+<li>在<code>BaseApplication</code>的<code>run()</code>中，会通过<code>Arbiter(self).run()</code>启动gunicorn的主进程。也就是说，主进程对象包含了一个<code>BaseApplication</code>对象，而<code>BaseApplication</code>对象可以通过<code>wsgi()</code>方法来获得原始的flask应用对象。</li>
+</ol>
+<ol start="3">
+<li>主进程对象的<code>run()</code>方法是一个while循环，监听时间并管理工作者进程的数量。在创建工作者进程时，<pre><code> worker = self.worker_class(self.worker_age, self.pid, self.LISTENERS,
+                            self.app, self.timeout / 2.0,
+                            self.cfg, self.log)
+</code></pre>
+会把<code>BaseApplication</code>对象传递给工作者进程，并通过：<pre><code> worker.init_process()
+</code></pre>
+初始化工作进程并启动工作者进程。</li>
+<li>在Worker的<code>init_process()</code>方法中，通过：<pre><code> self.wsgi = self.app.wsgi()
+</code></pre>
+工作者进程就获得了原始的Flask应用对象，并保存为<code>self.wsgi</code>。下面以<code>Sync</code>工作者进程为例。</li>
+<li><code>Sync</code>工作者监听socket， 使用<code>handle_request</code>方法来获取请求，并通过：<br> respiter = self.wsgi(environ, resp.start_response)<br>来调用<code>Flask</code>的<code>__call__</code>方法来让flask应用来处理请求。这就实现了<strong>gunicorn和Flask应用的通信过程</strong> </li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn/" rel="tag"># gunicorn</a>
+          
+            <a href="/tags/flask/" rel="tag"># flask</a>
+          
+            <a href="/tags/wsgi/" rel="tag"># wsgi</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/19/flask%E6%BA%90%E7%A0%81-Routing-%E5%A6%82%E4%BD%95%E8%A7%A3%E6%9E%90%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1/" rel="next" title="flask源码-Routing-如何解析动态路由">
+                <i class="fa fa-chevron-left"></i> flask源码-Routing-如何解析动态路由
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/23/flask%E7%9A%84%E8%B7%AF%E7%94%B1%E5%AE%9E%E7%8E%B0/" rel="prev" title="flask的路由实现">
+                flask的路由实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E8%B7%9F%E8%B8%AA"><span class="nav-number">2.</span> <span class="nav-text">代码跟踪</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#flask%E4%BB%A3%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">flask代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gunicorn%E4%BB%A3%E7%A0%81%E8%B7%9F%E8%B8%AA"><span class="nav-number">2.2.</span> <span class="nav-text">gunicorn代码跟踪</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gunicorn%E5%92%8Cflask%E9%80%9A%E4%BF%A1%E7%9A%84%E4%BB%A3%E7%A0%81"><span class="nav-number">2.3.</span> <span class="nav-text">gunicorn和flask通信的代码</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

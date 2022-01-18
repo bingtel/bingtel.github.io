@@ -1,0 +1,750 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="sanic,sanic路由," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="sanic教程   路由路由允许用户为不同的URL终端指定处理器函数。 下面是一个基本的路由样例，其中app是Sanic类的实例： 12345from sanic.response import json@app.route(&quot;&#x2F;&quot;)async def test(request):    return json(&amp;#123; &quot;hello&quot;: &quot;w">
+<meta property="og:type" content="article">
+<meta property="og:title" content="sanic路由">
+<meta property="og:url" content="http://yoursite.com/2017/07/10/sanic%E8%B7%AF%E7%94%B1/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="sanic教程   路由路由允许用户为不同的URL终端指定处理器函数。 下面是一个基本的路由样例，其中app是Sanic类的实例： 12345from sanic.response import json@app.route(&quot;&#x2F;&quot;)async def test(request):    return json(&amp;#123; &quot;hello&quot;: &quot;w">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-07-10T12:28:44.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:53.051Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="sanic">
+<meta property="article:tag" content="sanic路由">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/07/10/sanic路由/"/>
+
+
+
+
+
+  <title> sanic路由 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/07/10/sanic%E8%B7%AF%E7%94%B1/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                sanic路由
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-07-10T20:28:44+08:00">
+                2017-07-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/sanic/" itemprop="url" rel="index">
+                    <span itemprop="name">sanic</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <a href="/2017/07/10/sanic/" title="sanic教程">sanic教程</a>
+
+
+<h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><p>路由允许用户为不同的URL终端指定处理器函数。</p>
+<p>下面是一个基本的路由样例，其中<code>app</code>是<code>Sanic</code>类的实例：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import json</span><br><span class="line"></span><br><span class="line">@app.route(&quot;/&quot;)</span><br><span class="line">async def test(request):</span><br><span class="line">    return json(&#123; &quot;hello&quot;: &quot;world&quot; &#125;)</span><br></pre></td></tr></table></figure>
+
+<p>当<code>http://server.url/</code>被访问的时候，最后的<code>/</code>通过路由被匹配到<code>test</code>函数，该函数返回一个JSON对象。</p>
+<span id="more"></span>
+
+<p>Sanic的处理器一定要用<code>async def</code>来定义，因为它们都是异步函数。</p>
+<h3 id="请求参数"><a href="#请求参数" class="headerlink" title="请求参数"></a>请求参数</h3><p>Sanic配备了支持请求参数的基本路由器。</p>
+<p>为了指定一个参数，可以用”&lt;&gt;”包裹它，如<code>&lt;parameter&gt;</code>.请求参数会被作为关键字参数传给路由处理器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import text</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/tag/&lt;tag&gt;&#x27;)</span><br><span class="line">async def tag_handler(request, tag):</span><br><span class="line">    return text(&#x27;Tag - &#123;&#125;&#x27;.format(tag))</span><br></pre></td></tr></table></figure>
+
+<p>为了指定参数的类型，在”&lt;&gt;”里面，在参数名称的后面加上”:type”即可。如果参数和指定的类型不匹配，Sanic会抛出<code>NotFound</code>的异常，导致在指定的URL页面中显示<code>404: Page not found</code>的错误。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import text</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/number/&lt;integer_arg:int&gt;&#x27;)</span><br><span class="line">async def integer_handler(request, integer_arg):</span><br><span class="line">    return text(&#x27;Integer - &#123;&#125;&#x27;.format(integer_arg))</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/number/&lt;number_arg:number&gt;&#x27;)</span><br><span class="line">async def number_handler(request, number_arg):</span><br><span class="line">    return text(&#x27;Number - &#123;&#125;&#x27;.format(number_arg))</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/person/&lt;name:[A-z]&gt;&#x27;)</span><br><span class="line">async def person_handler(request, name):</span><br><span class="line">    return text(&#x27;Person - &#123;&#125;&#x27;.format(name))</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/folder/&lt;folder_id:[A-z0-9]&#123;0,4&#125;&gt;&#x27;)</span><br><span class="line">async def folder_handler(request, folder_id):</span><br><span class="line">    return text(&#x27;Folder - &#123;&#125;&#x27;.format(folder_id))</span><br></pre></td></tr></table></figure>
+
+<h3 id="HTTP请求的类型"><a href="#HTTP请求的类型" class="headerlink" title="HTTP请求的类型"></a>HTTP请求的类型</h3><p>默认情况下，一个URL上定义的路由，只接受以GET方式访问该URL的请求。然而，<code>@app.route</code>装饰器，接受一个可选的<code>methods</code>参数，该参数会允许处理器函数处理列表(methods对应的值是一个list)指定的所有的HTTP方法。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import text</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/post&#x27;, methods=[&#x27;POST&#x27;])</span><br><span class="line">async def post_handler(request):</span><br><span class="line">    return text(&#x27;POST request - &#123;&#125;&#x27;.format(request.json))</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/get&#x27;, methods=[&#x27;GET&#x27;])</span><br><span class="line">async def get_handler(request):</span><br><span class="line">    return text(&#x27;GET request - &#123;&#125;&#x27;.format(request.args))</span><br></pre></td></tr></table></figure>
+
+<p>还有一个可选的<code>host</code>参数(既可以是一个list也可以是string)。这会把一个路由限制到指定的主机上。如果有一个没有指定host的路由，该路由会是默认的路由。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@app.route(&#x27;/get&#x27;, methods=[&#x27;GET&#x27;], host=&#x27;example.com&#x27;)</span><br><span class="line">async def get_handler(request):</span><br><span class="line">    return text(&#x27;GET request - &#123;&#125;&#x27;.format(request.args))</span><br><span class="line"></span><br><span class="line"># if the host header doesn&#x27;t match example.com, this route will be used</span><br><span class="line">@app.route(&#x27;/get&#x27;, methods=[&#x27;GET&#x27;])</span><br><span class="line">async def get_handler(request):</span><br><span class="line">    return text(&#x27;GET request in default - &#123;&#125;&#x27;.format(request.args))</span><br></pre></td></tr></table></figure>
+
+<p>还有速记的方法装饰器：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import text</span><br><span class="line"></span><br><span class="line">@app.post(&#x27;/post&#x27;)</span><br><span class="line">async def post_handler(request):</span><br><span class="line">    return text(&#x27;POST request - &#123;&#125;&#x27;.format(request.json))</span><br><span class="line"></span><br><span class="line">@app.get(&#x27;/get&#x27;)</span><br><span class="line">async def get_handler(request):</span><br><span class="line">    return text(&#x27;GET request - &#123;&#125;&#x27;.format(request.args))</span><br></pre></td></tr></table></figure>
+
+<h3 id="add-route方法"><a href="#add-route方法" class="headerlink" title="add_route方法"></a>add_route方法</h3><p>我们已经看到，路由器通常使用<code>@app.route</code>装饰器来指定。然而，这个装饰器只是对<code>app.add_route</code>方法的一层包装，该方法使用如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">from sanic.response import text</span><br><span class="line"></span><br><span class="line"># Define the handler functions</span><br><span class="line">async def handler1(request):</span><br><span class="line">    return text(&#x27;OK&#x27;)</span><br><span class="line"></span><br><span class="line">async def handler2(request, name):</span><br><span class="line">    return text(&#x27;Folder - &#123;&#125;&#x27;.format(name))</span><br><span class="line"></span><br><span class="line">async def person_handler2(request, name):</span><br><span class="line">    return text(&#x27;Person - &#123;&#125;&#x27;.format(name))</span><br><span class="line"></span><br><span class="line"># Add each handler function as a route</span><br><span class="line">app.add_route(handler1, &#x27;/test&#x27;)</span><br><span class="line">app.add_route(handler2, &#x27;/folder/&lt;name&gt;&#x27;)</span><br><span class="line">app.add_route(person_handler2, &#x27;/person/&lt;name:[A-z]&gt;&#x27;, methods=[&#x27;GET&#x27;])</span><br></pre></td></tr></table></figure>
+
+<h3 id="使用url-for构建URL"><a href="#使用url-for构建URL" class="headerlink" title="使用url_for构建URL"></a>使用url_for构建URL</h3><p>Sanic提供了<code>url_for</code>方法，能够基于处理器的方法名称来构建对应的URL。这对于避免在应用中硬编码URL很有用；取而代之的是，你可以通过方法名称来引用URL。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">async def index(request):</span><br><span class="line">    # generate a URL for the endpoint `post_handler`</span><br><span class="line">    url = app.url_for(&#x27;post_handler&#x27;, post_id=5)</span><br><span class="line">    # the URL is `/posts/5`, redirect to it</span><br><span class="line">    return redirect(url)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/posts/&lt;post_id&gt;&#x27;)</span><br><span class="line">async def post_handler(request, post_id):</span><br><span class="line">    return text(&#x27;Post - &#123;&#125;&#x27;.format(post_id))</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>url_for</code>时，还要记住：</p>
+<ul>
+<li><p>传给url_for的关键字参数如果不是请求参数，将会出现在URL的查询参数中，如：</p>
+<pre><code>  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=&#39;one&#39;, arg_two=&#39;two&#39;)
+  # /posts/5?arg_one=one&amp;arg_two=two
+</code></pre>
+</li>
+<li><p>多值参数也可以传给url_for, 如：</p>
+<pre><code>  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=[&#39;one&#39;, &#39;two&#39;])
+  # /posts/5?arg_one=one&amp;arg_one=two
+</code></pre>
+</li>
+<li><p>一些特殊的参数(<code>_anchor</code>, <code>_external</code>, <code>_scheme</code>, <code>_method</code>, <code>_server</code>)传给url_for时，会有特殊的URL构建语义(<code>_method</code>当前不被支持，会被忽略)。如：</p>
+<pre><code>  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=&#39;one&#39;, _anchor=&#39;anchor&#39;)
+  # /posts/5?arg_one=one#anchor
+  
+  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=&#39;one&#39;, _external=True)
+  # //server/posts/5?arg_one=one
+  # _external requires passed argument _server or SERVER_NAME in app.config or url will be same as no _external
+  
+  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=&#39;one&#39;, _scheme=&#39;http&#39;, _external=True)
+  # http://server/posts/5?arg_one=one
+  # when specifying _scheme, _external must be True
+  
+  # you can pass all special arguments one time
+  url = app.url_for(&#39;post_handler&#39;, post_id=5, arg_one=[&#39;one&#39;, &#39;two&#39;], arg_two=2, _anchor=&#39;anchor&#39;, _scheme=&#39;http&#39;, _external=True, _server=&#39;another_server:8888&#39;)
+  # http://another_server:8888/posts/5?arg_one=one&amp;arg_one=two&amp;arg_two=2#anchor
+</code></pre>
+</li>
+<li><p>所有有效的参数都要传给url_for来构建URL。如果有参数未提供、或者参数和指定的类型不匹配，<code>URLBuildError</code>错误会被抛出。</p>
+</li>
+</ul>
+<h3 id="Websocket路由"><a href="#Websocket路由" class="headerlink" title="Websocket路由"></a>Websocket路由</h3><p>支持websocket协议的路由，可以使用<code>@app.websocket</code>来定义，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@app.websocket(&#x27;/feed&#x27;)</span><br><span class="line">async def feed(request, ws):</span><br><span class="line">    while True:</span><br><span class="line">        data = &#x27;hello!&#x27;</span><br><span class="line">        print(&#x27;Sending: &#x27; + data)</span><br><span class="line">        await ws.send(data)</span><br><span class="line">        data = await ws.recv()</span><br><span class="line">        print(&#x27;Received: &#x27; + data)</span><br></pre></td></tr></table></figure>
+<p><code>app.add_websocket_route</code>可以替换<code>@app.websocket</code>装饰器，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">async def feed(request, ws):</span><br><span class="line">    pass</span><br><span class="line"></span><br><span class="line">app.add_websocket_route(my_websocket_handler, &#x27;/feed&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>WebSocket路由的处理器作为第一个参数传递请求，WebSocket协议对象作为第二个参数。协议对象分别具有<code>send</code>和<code>recv</code>数据的发送和接收方法。</p>
+<p>对websocket的支持依赖于<code>Aymeric Augustin</code>提供的<a target="_blank" rel="noopener" href="https://github.com/aaugustin/websockets">websockets</a>包。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/sanic/" rel="tag"># sanic</a>
+          
+            <a href="/tags/sanic%E8%B7%AF%E7%94%B1/" rel="tag"># sanic路由</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/10/sanic%E5%85%A5%E9%97%A8/" rel="next" title="sanic入门">
+                <i class="fa fa-chevron-left"></i> sanic入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/11/sanic%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE/" rel="prev" title="sanic请求数据">
+                sanic请求数据 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1"><span class="nav-number">1.</span> <span class="nav-text">路由</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%B7%E6%B1%82%E5%8F%82%E6%95%B0"><span class="nav-number">1.1.</span> <span class="nav-text">请求参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTP%E8%AF%B7%E6%B1%82%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">HTTP请求的类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#add-route%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.</span> <span class="nav-text">add_route方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8url-for%E6%9E%84%E5%BB%BAURL"><span class="nav-number">1.4.</span> <span class="nav-text">使用url_for构建URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Websocket%E8%B7%AF%E7%94%B1"><span class="nav-number">1.5.</span> <span class="nav-text">Websocket路由</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,814 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="python,Counter,collections模块," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Counter的用途Dict subclass for counting hashable items.  Sometimes called a bag or multiset.  Elements are stored as dictionary keys and their counts are stored as dictionary values.  即： Dict的子类，但是value是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python2.7-collections模块之Counter">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/python2-7-collections%E6%A8%A1%E5%9D%97%E4%B9%8BCounter/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Counter的用途Dict subclass for counting hashable items.  Sometimes called a bag or multiset.  Elements are stored as dictionary keys and their counts are stored as dictionary values.  即： Dict的子类，但是value是">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:09:04.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.889Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="Counter">
+<meta property="article:tag" content="collections模块">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/python2-7-collections模块之Counter/"/>
+
+
+
+
+
+  <title> python2.7-collections模块之Counter | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/python2-7-collections%E6%A8%A1%E5%9D%97%E4%B9%8BCounter/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                python2.7-collections模块之Counter
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:09:04+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Counter的用途"><a href="#Counter的用途" class="headerlink" title="Counter的用途"></a>Counter的用途</h3><pre><code>Dict subclass for counting hashable items.  Sometimes called a bag
+or multiset.  Elements are stored as dictionary keys and their counts
+are stored as dictionary values.
+</code></pre>
+<p>即： Dict的子类，但是value是统计元素出现次数的字典。</p>
+<span id="more"></span>
+
+<h3 id="用例"><a href="#用例" class="headerlink" title="用例"></a>用例</h3><pre><code>&gt;&gt;&gt; c = Counter(&#39;abcdeabcdabcaba&#39;)  # count elements from a string
+
+&gt;&gt;&gt; c.most_common(3)                # three most common elements 出现次数最多的3个元素
+[(&#39;a&#39;, 5), (&#39;b&#39;, 4), (&#39;c&#39;, 3)]
+&gt;&gt;&gt; sorted(c)                       # list all unique elements
+[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;, &#39;e&#39;]
+&gt;&gt;&gt; &#39;&#39;.join(sorted(c.elements()))   # list elements with repetitions
+&#39;aaaaabbbbcccdde&#39;
+&gt;&gt;&gt; sum(c.values())                 # total of all counts
+15 
+
+&gt;&gt;&gt; c[&#39;a&#39;]                          # count of letter &#39;a&#39;
+5
+&gt;&gt;&gt; for elem in &#39;shazam&#39;:           # update counts from an iterable
+...     c[elem] += 1                # by adding 1 to each element&#39;s count
+&gt;&gt;&gt; c[&#39;a&#39;]                          # now there are seven &#39;a&#39;
+7
+&gt;&gt;&gt; del c[&#39;b&#39;]                      # remove all &#39;b&#39;
+&gt;&gt;&gt; c[&#39;b&#39;]                          # now there are zero &#39;b&#39;
+0
+
+&gt;&gt;&gt; d = Counter(&#39;simsalabim&#39;)       # make another counter
+&gt;&gt;&gt; c.update(d)                     # add in the second counter
+&gt;&gt;&gt; c[&#39;a&#39;]                          # now there are nine &#39;a&#39;
+9
+
+&gt;&gt;&gt; c.clear()                       # empty the counter
+&gt;&gt;&gt; c
+Counter()
+
+Note:  If a count is set to zero or reduced to zero, it will remain
+in the counter until the entry is deleted or the counter is cleared:
+
+&gt;&gt;&gt; c = Counter(&#39;aaabbc&#39;)
+&gt;&gt;&gt; c[&#39;b&#39;] -= 2                     # reduce the count of &#39;b&#39; by two
+&gt;&gt;&gt; c.most_common()                 # &#39;b&#39; is still in, but its count is zero
+[(&#39;a&#39;, 3), (&#39;c&#39;, 1), (&#39;b&#39;, 0)]
+</code></pre>
+<h3 id="源码实现"><a href="#源码实现" class="headerlink" title="源码实现"></a>源码实现</h3><h4 id="init-方法"><a href="#init-方法" class="headerlink" title="init()方法"></a><strong>init</strong>()方法</h4><pre><code>def __init__(*args, **kwds):
+    &#39;&#39;&#39;Create a new, empty Counter object.  And if given, count elements
+    from an input iterable.  Or, initialize the count from another mapping
+    of elements to their counts.
+
+    &gt;&gt;&gt; c = Counter()                           # a new, empty counter
+    &gt;&gt;&gt; c = Counter(&#39;gallahad&#39;)                 # a new counter from an iterable
+    &gt;&gt;&gt; c = Counter(&#123;&#39;a&#39;: 4, &#39;b&#39;: 2&#125;)           # a new counter from a mapping
+    &gt;&gt;&gt; c = Counter(a=4, b=2)                   # a new counter from keyword args
+
+    &#39;&#39;&#39;
+    if not args:
+        raise TypeError(&quot;descriptor &#39;__init__&#39; of &#39;Counter&#39; object &quot;
+                        &quot;needs an argument&quot;)
+    self = args[0]
+    args = args[1:]
+    if len(args) &gt; 1:  # 只允许传入一个参数
+        raise TypeError(&#39;expected at most 1 arguments, got %d&#39; % len(args))
+    super(Counter, self).__init__()
+    self.update(*args, **kwds)  # 自定义的update方法
+</code></pre>
+<h4 id="update-方法"><a href="#update-方法" class="headerlink" title="update()方法"></a>update()方法</h4><pre><code>def update(*args, **kwds):
+    &#39;&#39;&#39;Like dict.update() but add counts instead of replacing them.
+
+    Source can be an iterable, a dictionary, or another Counter instance.
+
+    &gt;&gt;&gt; c = Counter(&#39;which&#39;)
+    &gt;&gt;&gt; c.update(&#39;witch&#39;)           # add elements from another iterable
+    &gt;&gt;&gt; d = Counter(&#39;watch&#39;)
+    &gt;&gt;&gt; c.update(d)                 # add elements from another counter
+    &gt;&gt;&gt; c[&#39;h&#39;]                      # four &#39;h&#39; in which, witch, and watch
+    4
+
+    &#39;&#39;&#39;
+    # The regular dict.update() operation makes no sense here because the
+    # replace behavior results in the some of original untouched counts
+    # being mixed-in with all of the other counts for a mismash that
+    # doesn&#39;t have a straight-forward interpretation in most counting
+    # contexts.  Instead, we implement straight-addition.  Both the inputs
+    # and outputs are allowed to contain zero and negative counts.
+
+    if not args:
+        raise TypeError(&quot;descriptor &#39;update&#39; of &#39;Counter&#39; object &quot;
+                        &quot;needs an argument&quot;)
+    self = args[0]
+    args = args[1:]
+    if len(args) &gt; 1:
+        raise TypeError(&#39;expected at most 1 arguments, got %d&#39; % len(args))
+    iterable = args[0] if args else None
+    if iterable is not None:
+        if isinstance(iterable, Mapping):
+            if self:
+                self_get = self.get
+                for elem, count in iterable.iteritems():
+                    self[elem] = self_get(elem, 0) + count
+            else:
+                super(Counter, self).update(iterable) # fast path when counter is empty
+        else:
+            self_get = self.get
+            for elem in iterable:
+                self[elem] = self_get(elem, 0) + 1
+    if kwds:
+        self.update(kwds)
+</code></pre>
+<p>可见，在update()方法里面实现了对元素出现个数的统计。</p>
+<h4 id="elements-方法"><a href="#elements-方法" class="headerlink" title="elements()方法"></a>elements()方法</h4><pre><code>def elements(self):
+    &#39;&#39;&#39;Iterator over elements repeating each as many times as its count.
+
+    &gt;&gt;&gt; c = Counter(&#39;ABCABC&#39;)
+    &gt;&gt;&gt; sorted(c.elements())
+    [&#39;A&#39;, &#39;A&#39;, &#39;B&#39;, &#39;B&#39;, &#39;C&#39;, &#39;C&#39;]
+
+    # Knuth&#39;s example for prime factors of 1836:  2**2 * 3**3 * 17**1
+    &gt;&gt;&gt; prime_factors = Counter(&#123;2: 2, 3: 3, 17: 1&#125;)
+    &gt;&gt;&gt; product = 1
+    &gt;&gt;&gt; for factor in prime_factors.elements():     # loop over factors
+    ...     product *= factor                       # and multiply them
+    &gt;&gt;&gt; product
+    1836
+
+    Note, if an element&#39;s count has been set to zero or is a negative
+    number, elements() will ignore it.
+
+    &#39;&#39;&#39;
+    # Emulate Bag.do from Smalltalk and Multiset.begin from C++.
+    return _chain.from_iterable(_starmap(_repeat, self.iteritems()))
+</code></pre>
+<p>可见， 返回的元素是按照频次递减的。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/python/" rel="tag"># python</a>
+          
+            <a href="/tags/Counter/" rel="tag"># Counter</a>
+          
+            <a href="/tags/collections%E6%A8%A1%E5%9D%97/" rel="tag"># collections模块</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/flask-%E4%B8%8D%E4%BD%BF%E7%94%A8Bootstrap%E6%8F%92%E4%BB%B6%E6%9D%A5%E8%BF%9B%E8%A1%8C%E8%A1%A8%E5%8D%95%E5%BC%80%E5%8F%91/" rel="next" title="flask-不使用Bootstrap插件来进行表单开发">
+                <i class="fa fa-chevron-left"></i> flask-不使用Bootstrap插件来进行表单开发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn-%E7%BB%BF%E8%89%B2%E7%8B%AC%E8%A7%92%E5%85%BD-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="prev" title="gunicorn(绿色独角兽)官方文档">
+                gunicorn(绿色独角兽)官方文档 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Counter%E7%9A%84%E7%94%A8%E9%80%94"><span class="nav-number">1.</span> <span class="nav-text">Counter的用途</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E4%BE%8B"><span class="nav-number">2.</span> <span class="nav-text">用例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">源码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#init-%E6%96%B9%E6%B3%95"><span class="nav-number">3.1.</span> <span class="nav-text">init()方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#update-%E6%96%B9%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">update()方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#elements-%E6%96%B9%E6%B3%95"><span class="nav-number">3.3.</span> <span class="nav-text">elements()方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn官方文档,gunicorn运行," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Running Gunicorn(运行Gunicorn)You can run Gunicorn by using commands or integrate with Django or Paster. For deploying Gunicorn in production see Deploying Gunicorn. 你可以使用命令或者使用Django或这Paster的集成来运行Gunic">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gunicorn官方文档翻译-运行">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%BF%90%E8%A1%8C/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Running Gunicorn(运行Gunicorn)You can run Gunicorn by using commands or integrate with Django or Paster. For deploying Gunicorn in production see Deploying Gunicorn. 你可以使用命令或者使用Django或这Paster的集成来运行Gunic">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:14:58.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.672Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn官方文档">
+<meta property="article:tag" content="gunicorn运行">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/gunicorn官方文档翻译-运行/"/>
+
+
+
+
+
+  <title> gunicorn官方文档翻译-运行 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%BF%90%E8%A1%8C/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                gunicorn官方文档翻译-运行
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:14:58+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gunicorn/" itemprop="url" rel="index">
+                    <span itemprop="name">gunicorn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Running-Gunicorn-运行Gunicorn"><a href="#Running-Gunicorn-运行Gunicorn" class="headerlink" title="Running Gunicorn(运行Gunicorn)"></a>Running Gunicorn(运行Gunicorn)</h1><p>You can run Gunicorn by using commands or integrate with Django or Paster. For deploying Gunicorn in production see Deploying Gunicorn.</p>
+<p>你可以使用命令或者使用Django或这Paster的集成来运行Gunicorn。为了在生产环境中部署Gunicorn， 请参阅Deploying Gunicorn。</p>
+<span id="more"></span>
+
+<h2 id="Commands-命令"><a href="#Commands-命令" class="headerlink" title="Commands(命令)"></a>Commands(命令)</h2><p>After installing Gunicorn you will have access to the command line script gunicorn.</p>
+<p>在安装Gunicorn之后， 你能给使用命令命令脚本：</p>
+<pre><code>gunicorn
+</code></pre>
+<h3 id="gunicorn"><a href="#gunicorn" class="headerlink" title="gunicorn"></a>gunicorn</h3><p><strong>Basic usage(基本用法)</strong>:</p>
+<pre><code>$ gunicorn [OPTIONS] APP_MODULE
+</code></pre>
+<p>Where APP_MODULE is of the pattern $(MODULE_NAME):$(VARIABLE_NAME). The module name can be a full dotted path. The variable name refers to a WSGI callable that should be found in the specified module.</p>
+<p>其中， APP_MODULE指得是：$(MODULE_NAME):$(VARIABLE_NAME)。 模块名可以是完整的路径；变量名值得是该模块中存在的能够调用的WSGI对象。</p>
+<p>Example with the test app:</p>
+<p>用test app 作为例子：</p>
+<pre><code>def app(environ, start_response):
+    &quot;&quot;&quot;Simplest possible application object&quot;&quot;&quot;
+    data = &#39;Hello, World!\n&#39;
+    status = &#39;200 OK&#39;
+    response_headers = [
+        (&#39;Content-type&#39;,&#39;text/plain&#39;),
+        (&#39;Content-Length&#39;, str(len(data)))
+    ]
+    start_response(status, response_headers)
+    return iter([data])
+</code></pre>
+<p>You can now run the app with the following command:</p>
+<p>可以使用下述命令来运行app。</p>
+<pre><code>$ gunicorn --workers=2 test:app
+</code></pre>
+<h2 id="Commonly-Used-Arguments-常用参数"><a href="#Commonly-Used-Arguments-常用参数" class="headerlink" title="Commonly Used Arguments(常用参数)"></a>Commonly Used Arguments(常用参数)</h2><ul>
+<li><p>-c CONFIG, –config=CONFIG - Specify a config file in the form $(PATH), file:$(PATH), or python:$(MODULE_NAME).</p>
+<p>  -c CONFIG, –config=CONFIG -指定了配置文件， 格式是：$(PATH)、file:$(PATH)、或者python:$(MODULE_NAME)</p>
+</li>
+<li><p>-b BIND, –bind=BIND - Specify a server socket to bind. Server sockets can be any of $(HOST), $(HOST):$(PORT), or unix:$(PATH). An IP is a valid $(HOST).</p>
+<p>  -b BIND, –bind=BIND - 指定要绑定的服务器socket， 可以是 $(HOST), $(HOST):$(PORT), 或者unix:$(PATH)。IP也是有效的$(HOST)。</p>
+</li>
+<li><p>-w WORKERS, –workers=WORKERS - The number of worker processes. This number should generally be between 2-4 workers per core in the server. Check the FAQ for ideas on tuning this parameter.</p>
+<p>  -w WORKERS, –workers=WORKERS - 工作者进程数量， 一般是CPU核数的2-4倍。启用该参数时， 请查阅FAQ。</p>
+</li>
+<li><p>-k WORKERCLASS, –worker-class=WORKERCLASS - The type of worker process to run. You’ll definitely want to read the production page for the implications of this parameter. You can set this to $(NAME) where $(NAME) is one of sync, eventlet, gevent, or tornado, gthread, gaiohttp. sync is the default.</p>
+<p>  -k WORKERCLASS, –worker-class=WORKERCLASS - 工作者进程的类型。你一定要查阅该参数的生产环境下的说明文档。该参数的值可以被设置成sync，eventlet， gevent或者 tornado, gthread, gaiohttp中的一种。 默认是sync。</p>
+</li>
+<li><p>-n APP_NAME, –name=APP_NAME - If setproctitle is installed you can adjust the name of Gunicorn process as they appear in the process system table (which affects tools like ps and top).</p>
+<p>  -n APP_NAME, –name=APP_NAME - 如果安装了setproctitle， 当Gunicorn进程出现在进程表中时，你可以调整它们的名称(会影响ps和top等命令)</p>
+</li>
+</ul>
+<p>See Configuration Overview and Settings for detailed usage.</p>
+<p>查看配置概览来获取更详细的用法。</p>
+<h2 id="Integration-集成"><a href="#Integration-集成" class="headerlink" title="Integration(集成)"></a>Integration(集成)</h2><p>We also provide integration for both Django and Paster applications.</p>
+<p>我们也提供对Django和Paster的集成。</p>
+<h2 id="Django"><a href="#Django" class="headerlink" title="Django"></a>Django</h2><p>Gunicorn will look for a WSGI callable named application if not specified. So for a typical Django project, invoking Gunicorn would look like:</p>
+<p>如果没有指定的话，Gunicorn会去查找一个可以调用的WSGI对象。所以， 对于一个Django项目， 调用Gunicorn的方式如下：</p>
+<pre><code>$ gunicorn myproject.wsgi
+</code></pre>
+<h3 id="Note-注意"><a href="#Note-注意" class="headerlink" title="Note(注意)"></a>Note(注意)</h3><pre><code>This requires that your project be on the Python path; the simplest way to ensure that is to run this command from the same directory as your manage.py file.
+
+这要求你的项目在Python的路径中；确保这一点最简单的方式就是从manage.py的同级目录中运行上述命令。
+</code></pre>
+<p>You can use the –env option to set the path to load the settings. In case you need it you can also add your application path to PYTHONPATH using the –pythonpath option:</p>
+<p>你也可以使用**-env<strong>选项来加载配置。你也可以使用</strong>–pythonpath**把项目路径添加到PYTHONPATH。</p>
+<pre><code>$ gunicorn --env DJANGO_SETTINGS_MODULE=myproject.settings myproject.wsgi
+</code></pre>
+<h2 id="Paste"><a href="#Paste" class="headerlink" title="Paste"></a>Paste</h2><p>If you are a user/developer of a paste-compatible framework/app (as Pyramid, Pylons and Turbogears) you can use the –paste option to run your application.</p>
+<p>如果你是支持paste的框架(像Pyramid, Pylons,Turbogears)的用户/开发者， 你可以使用-paste选项来运行你的应用：</p>
+<p>For example:</p>
+<p>如：</p>
+<pre><code>$ gunicorn --paste development.ini -b :8080 --chdir /path/to/project
+</code></pre>
+<p>Or use a different application:</p>
+<p>或者使用不同的应用：</p>
+<pre><code>$ gunicorn --paste development.ini#admin -b :8080 --chdir /path/to/project
+</code></pre>
+<p>It is all here. No configuration files nor additional Python modules to write!</p>
+<p>说完了。 没有额外的Python配置文件或者模块要说。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="tag"># gunicorn官方文档</a>
+          
+            <a href="/tags/gunicorn%E8%BF%90%E8%A1%8C/" rel="tag"># gunicorn运行</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn-%E7%BB%BF%E8%89%B2%E7%8B%AC%E8%A7%92%E5%85%BD-%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="next" title="gunicorn(绿色独角兽)官方文档">
+                <i class="fa fa-chevron-left"></i> gunicorn(绿色独角兽)官方文档
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E9%85%8D%E7%BD%AE%E6%A6%82%E8%A7%88/" rel="prev" title="gunicorn官方文档翻译-配置概览">
+                gunicorn官方文档翻译-配置概览 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Running-Gunicorn-%E8%BF%90%E8%A1%8CGunicorn"><span class="nav-number">1.</span> <span class="nav-text">Running Gunicorn(运行Gunicorn)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Commands-%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.</span> <span class="nav-text">Commands(命令)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gunicorn"><span class="nav-number">1.1.1.</span> <span class="nav-text">gunicorn</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Commonly-Used-Arguments-%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">Commonly Used Arguments(常用参数)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Integration-%E9%9B%86%E6%88%90"><span class="nav-number">1.3.</span> <span class="nav-text">Integration(集成)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django"><span class="nav-number">1.4.</span> <span class="nav-text">Django</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Note-%E6%B3%A8%E6%84%8F"><span class="nav-number">1.4.1.</span> <span class="nav-text">Note(注意)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Paste"><span class="nav-number">1.5.</span> <span class="nav-text">Paste</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

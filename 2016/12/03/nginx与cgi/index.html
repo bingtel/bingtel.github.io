@@ -1,0 +1,838 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="nginx,cgi,nginx编译安装,nginx命令,python cgi," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="nginx的安装从nginx官网上下载nginx，最好是稳定版本，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx与cgi">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/nginx%E4%B8%8Ecgi/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="nginx的安装从nginx官网上下载nginx，最好是稳定版本，">
+<meta property="og:locale">
+<meta property="og:image" content="http://yoursite.com/img/2016/12/3/1.png">
+<meta property="og:image" content="http://yoursite.com/img/2016/12/3/2.png">
+<meta property="og:image" content="http://yoursite.com/img/2016/12/3/nginx_usage.png">
+<meta property="og:image" content="http://yoursite.com/img/2016/12/3/nginx_dir.png">
+<meta property="article:published_time" content="2016-12-03T10:12:37.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.841Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="nginx">
+<meta property="article:tag" content="cgi">
+<meta property="article:tag" content="nginx编译安装">
+<meta property="article:tag" content="nginx命令">
+<meta property="article:tag" content="python cgi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/img/2016/12/3/1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/nginx与cgi/"/>
+
+
+
+
+
+  <title> nginx与cgi | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/nginx%E4%B8%8Ecgi/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                nginx与cgi
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T18:12:37+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/nginx/" itemprop="url" rel="index">
+                    <span itemprop="name">nginx</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="nginx的安装"><a href="#nginx的安装" class="headerlink" title="nginx的安装"></a>nginx的安装</h2><p>从nginx官网上下载nginx，最好是稳定版本，</p>
+<span id="more"></span>
+
+<p><img src="/img/2016/12/3/1.png" alt="nginx下载页面"></p>
+<p>安装nginx依赖，</p>
+<pre><code>sudo apt-get install libssl-dev 
+sudo apt-get install libpcre3 libpcre3-dev 
+</code></pre>
+<p>解压nginx源码包后，检查编译环境，</p>
+<pre><code>./configure --prefix=/usr/local/nginx 
+</code></pre>
+<p>如果没有提示错误，执行</p>
+<pre><code>make make install
+</code></pre>
+<p>中间可能会提示“Permission denied”错误，请执行“sudo make install”。</p>
+<p>进入nginx的安装目录</p>
+<pre><code>cd /usr/local/nginx/
+</code></pre>
+<p>通过</p>
+<pre><code>sudo ./sbin/nginx
+</code></pre>
+<p>来启动nginx服务器。由于nginx的默认端口是80，可以在浏览器中访问</p>
+<pre><code>http://localhost/
+</code></pre>
+<p>查看nginx是否启动成功，也可以通过命令：</p>
+<pre><code>lsof -i:80
+</code></pre>
+<p>来查看。如果启动成功， 可以看到：</p>
+<p><img src="/img/2016/12/3/2.png" alt="nginx首页"></p>
+<p>常用命令如下：</p>
+<pre><code>/usr/local/sbin/nginx -s stop # fast shutdown
+/usr/local/sbin/nginx -s reload # reloading the configuration file
+/usr/local/sbin/nginx -s quit # graceful(优美地) shutdown
+/usr/local/sbin/nginx -s reopen # reopening the log files
+</code></pre>
+<p>关于reload命令，</p>
+<pre><code>Once the master process receives the signal to reload configuration, it checks the syntax validity of the new configuration file and tries to apply the configuration provided in it. If this is a success, the master process starts new worker processes and sends messages to old worker processes, requesting them to shut down. Otherwise, the master process rolls back the changes and continues to work with the old configuration. Old worker processes, receiving a command to shut down, stop accepting new connections and continue to service current requests until all such requests are serviced. After that, the old worker processes exit.
+
+一旦主进程接收到&quot;重新加载&quot;的信号，它就会验证新配置文件的语法，然后试着把新配置应用到自身；成功的话，主进程会开启新的工作者进程，并向老的工作者进程发送信息，要求他们停止；不然，主进程就会把变更回滚，继续用老的配置工作。老的进程收到（要求自己）关闭的命令后，就会停止接收新的连接，并继续服务当前的请求，直至所有的请求被处理完，然后，老的工作者进程退出。
+</code></pre>
+<p>同时可以看到，nginx目录下出现了许多”_temp”后缀的文件夹（先挖个坑）,没有该后缀的目录是原有的文件夹，从命名上也能知道该文件夹的用途。</p>
+<p><img src="/img/2016/12/3/nginx_usage.png" alt="nginx目录"></p>
+<h2 id="nginx的配置"><a href="#nginx的配置" class="headerlink" title="nginx的配置"></a>nginx的配置</h2><h3 id="配置文件"><a href="#配置文件" class="headerlink" title="配置文件"></a>配置文件</h3><p>nginx的配置文件是在conf/nginx.conf；初始情况下，该文件和nginx.conf.default相同，可通过：</p>
+<pre><code>diff nginx.conf nginx.conf.default
+</code></pre>
+<p>验证。所以第一次修改nginx.conf文件时，不需要事先备份。</p>
+<h3 id="配置项说明"><a href="#配置项说明" class="headerlink" title="配置项说明"></a>配置项说明</h3><p><strong>worker_processes</strong></p>
+<p>nginx.conf中，</p>
+<pre><code>worker_processes  1;
+</code></pre>
+<p>指的是</p>
+<pre><code>工作者进程的数量。
+
+ The number of worker processes is defined in the configuration file and may be fixed for a given configuration or automatically adjusted to the number of available CPU cores
+</code></pre>
+<p>可以通过命令：</p>
+<pre><code>ps -ef | grep &#39;nginx&#39;
+</code></pre>
+<p>查看，显示结果，</p>
+<p><img src="/img/2016/12/3/nginx_dir.png" alt="nginx目录"></p>
+<p><strong>events</strong></p>
+<pre><code>events &#123;
+    worker_connections  1024;
+&#125;
+</code></pre>
+<p>指的是：</p>
+<pre><code>Sets the maximum number of simultaneous connections that can be opened by a worker process.
+</code></pre>
+<p><strong>http</strong></p>
+<p>http的配置中， * keepalive_timeout 给客户端分配keep-alive链接超时时间。服务器将在这个超时时间过后关闭链接 * location 把请求转给html文件夹下的文件(url的路径和html下的文件相对路径匹配)</p>
+<p>其它的配置，注释说的很清楚,不再赘述。</p>
+<h2 id="cgi协议"><a href="#cgi协议" class="headerlink" title="cgi协议"></a>cgi协议</h2><h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>cgi(common gateway interface,通用网关接口)是外部应用程序（CGI程序）与Web服务器之间的接口标准，是在CGI程序和Web服务器之间传递信息的规程。CGI规范允许Web服务器执行外部程序，并将它们的输出发送给Web浏览器，CGI将Web的一组简单的静态超媒体文档变成一个完整的新的交互式媒体。</p>
+<h3 id="处理请求的步骤"><a href="#处理请求的步骤" class="headerlink" title="处理请求的步骤"></a>处理请求的步骤</h3><ol>
+<li> 通过Internet把用户请求送到web服务器。</li>
+<li> Web服务器接收用户请求并交给CGI程序处理。</li>
+<li> CGI程序把处理结果传送给web服务器。</li>
+<li> Web服务器把结果送回到用户。</li>
+</ol>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><p>python的cgi例子,显示系统的当前时间time_cgi.py：</p>
+<pre><code>from time import ctime
+def main():
+    print &quot;Content-type:text/html&quot;
+    print &#39;&lt;html&gt;&#39;
+    print &#39;&lt;head&gt;&#39;
+    print &#39;&lt;title&gt;time&lt;/title&gt;&#39;
+    print &#39;&lt;/head&gt;&#39;
+    print &#39;&lt;body&gt;&#39;
+    print &#39;&lt;h2&gt;Hello, current time is:%s &lt;/h2&gt;&#39; % ctime()
+    print &#39;&lt;/body&gt;&#39;
+    print &#39;&lt;/html&gt;&#39;
+if __name__==&#39;__main__&#39;:
+    main()
+</code></pre>
+<h2 id="fastcgi服务器和客户端访问实例"><a href="#fastcgi服务器和客户端访问实例" class="headerlink" title="fastcgi服务器和客户端访问实例"></a>fastcgi服务器和客户端访问实例</h2><p>安装flup</p>
+<pre><code>wget http://www.saddi.com/software/flup/dist/flup-1.0.1.tar.gz
+tar xzvf flup-1.0.1.tar.gz
+cd flup-1.0.1 
+sudo python setup.py install
+</code></pre>
+<p>安装spawn-fcgi</p>
+<p>sudo apt-get install spawn-fcgi</p>
+<p>配置nginx.conf,添加：</p>
+<pre><code>server&#123;
+    listen  8000;#访问的端口
+    server_name test.com;#任意
+    location /&#123;
+        #fastcgi_pass  unix:/tmp/python-cgi.sock;
+        fastcgi_pass  127.0.0.1:8008;
+        fastcgi_param SCRIPT_FILENAME &quot;&quot;;
+        fastcgi_param PATH_INFO $fastcgi_script_name;
+        include fastcgi.conf;#和nginx.conf在同一个目录下
+    &#125;
+&#125;    
+</code></pre>
+<p>修改time_cgi.py的代码</p>
+<pre><code>#!/usr/bin/python
+from time import ctime
+import flup.server.fcgi as flups
+def main(environ, start_response):
+    start_response(&#39;200 OK&#39;, [(&#39;Content-Type&#39;, &#39;text/plain&#39;)])
+    str=&#39;Hello, current time is:%s &#39; % ctime()
+    return [str]
+if __name__==&#39;__main__&#39;:
+    flups.WSGIServer(main).run()
+</code></pre>
+<p>启动：</p>
+<pre><code>sudo spawn-fcgi  -f ./time_cgi.py  -a 127.0.0.1 -p 8008  -F 1 -P /var/run/time_cgi.pid -u bingtel
+
+-f 要执行的文件（不理解的可以思考php-cgi这个命令）
+-a 监听的地址
+-p 监听的端口(这个不是nginx监听的网络端口，而是nginx的fastcgi-pass传过来的端口)
+-F fastcgi开启的进程数(不理解的可以思考下php的php-cgi数目)
+-P 开启的进程的进程号所写入的文件（有了这个就可以很轻松的杀掉开启的fasgcgi）
+-u  以什么用户身份运行
+</code></pre>
+<p>访问：</p>
+<pre><code>http://127.0.0.1:8000/
+</code></pre>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>  <a target="_blank" rel="noopener" href="http://linmomo02.iteye.com/blog/1490657">ubuntu nginx 安装以及配置文件详解</a></li>
+<li>  <a target="_blank" rel="noopener" href="http://blog.csdn.net/zuiaituantuan/article/details/7264969">nginx的 CPU参数worker_processes和worker_cpu_affinity使用说明</a></li>
+<li>  <a target="_blank" rel="noopener" href="http://www.yiibai.com/python/python_cgi_programming.html">Python CGI编程</a></li>
+<li>  <a target="_blank" rel="noopener" href="http://blog.163.com/sky20081816@126/blog/static/1647610232010824262695/">nginx上用fastcgi配置python环境(一)</a></li>
+<li>  <a target="_blank" rel="noopener" href="http://jingyan.baidu.com/article/925f8cb819b94bc0dde05697.html">nginx上用fastcgi配置python环境：<a target="_blank" rel="noopener" href="http://www.bingtel.wang/wp-content/uploads/2016/01/2.png">2</a>2</a></li>
+<li>  <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/beginners_guide.html">nginx官方新人指南</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nginx/" rel="tag"># nginx</a>
+          
+            <a href="/tags/cgi/" rel="tag"># cgi</a>
+          
+            <a href="/tags/nginx%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85/" rel="tag"># nginx编译安装</a>
+          
+            <a href="/tags/nginx%E5%91%BD%E4%BB%A4/" rel="tag"># nginx命令</a>
+          
+            <a href="/tags/python-cgi/" rel="tag"># python cgi</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/HTTPS%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/" rel="next" title="HTTPS的工作原理">
+                <i class="fa fa-chevron-left"></i> HTTPS的工作原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/%E8%87%AA%E5%8A%A8%E5%88%9B%E5%BB%BAflask%E9%A1%B9%E7%9B%AE/" rel="prev" title="自动创建flask项目">
+                自动创建flask项目 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx%E7%9A%84%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">nginx的安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nginx%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">nginx的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.1.</span> <span class="nav-text">配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9%E8%AF%B4%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text">配置项说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cgi%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">cgi协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E8%AF%B7%E6%B1%82%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.2.</span> <span class="nav-text">处理请求的步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.3.</span> <span class="nav-text">例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fastcgi%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AE%BF%E9%97%AE%E5%AE%9E%E4%BE%8B"><span class="nav-number">4.</span> <span class="nav-text">fastcgi服务器和客户端访问实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">参考</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

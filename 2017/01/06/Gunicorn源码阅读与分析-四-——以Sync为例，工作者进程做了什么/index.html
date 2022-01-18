@@ -1,0 +1,708 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn源码,gunicorn,gunicorn工作者,SyncWorker," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在Gunicorn源码阅读与分析-二-——gunicorn的信号处理以及对工作者进程的管理中介绍了gunicorn主进程的工作方法，并且提到了run()方法是工作者进程启动的入口，本文将介绍一下工作者进程是如何工作的。 这里只介绍gunicorn默认的工作者进程SyncWorker.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gunicorn源码阅读与分析(四)——以Sync为例，工作者进程做了什么?">
+<meta property="og:url" content="http://yoursite.com/2017/01/06/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E5%9B%9B-%E2%80%94%E2%80%94%E4%BB%A5Sync%E4%B8%BA%E4%BE%8B%EF%BC%8C%E5%B7%A5%E4%BD%9C%E8%80%85%E8%BF%9B%E7%A8%8B%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="在Gunicorn源码阅读与分析-二-——gunicorn的信号处理以及对工作者进程的管理中介绍了gunicorn主进程的工作方法，并且提到了run()方法是工作者进程启动的入口，本文将介绍一下工作者进程是如何工作的。 这里只介绍gunicorn默认的工作者进程SyncWorker.">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-01-05T23:28:59.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.744Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn源码">
+<meta property="article:tag" content="gunicorn">
+<meta property="article:tag" content="gunicorn工作者">
+<meta property="article:tag" content="SyncWorker">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/01/06/Gunicorn源码阅读与分析-四-——以Sync为例，工作者进程做了什么/"/>
+
+
+
+
+
+  <title> Gunicorn源码阅读与分析(四)——以Sync为例，工作者进程做了什么? | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/06/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E5%9B%9B-%E2%80%94%E2%80%94%E4%BB%A5Sync%E4%B8%BA%E4%BE%8B%EF%BC%8C%E5%B7%A5%E4%BD%9C%E8%80%85%E8%BF%9B%E7%A8%8B%E5%81%9A%E4%BA%86%E4%BB%80%E4%B9%88/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Gunicorn源码阅读与分析(四)——以Sync为例，工作者进程做了什么?
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-06T07:28:59+08:00">
+                2017-01-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gunicorn/" itemprop="url" rel="index">
+                    <span itemprop="name">gunicorn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在<a href="/2017/01/05/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E4%BA%8C-%E2%80%94%E2%80%94gunicorn%E7%9A%84%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E4%BB%A5%E5%8F%8A%E5%AF%B9%E5%B7%A5%E4%BD%9C%E8%80%85%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%AE%A1%E7%90%86/" title="Gunicorn源码阅读与分析-二-——gunicorn的信号处理以及对工作者进程的管理">Gunicorn源码阅读与分析-二-——gunicorn的信号处理以及对工作者进程的管理</a>中介绍了gunicorn主进程的工作方法，并且提到了<code>run()</code>方法是工作者进程启动的入口，本文将介绍一下工作者进程是如何工作的。</p>
+<p>这里只介绍gunicorn默认的工作者进程<code>SyncWorker</code>.</p>
+<span id="more"></span>
+
+<h3 id="run"><a href="#run" class="headerlink" title="run()"></a>run()</h3><p>该方法的定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">def run(self):</span><br><span class="line">    # if no timeout is given the worker will never wait and will</span><br><span class="line">    # use the CPU for nothing. This minimal timeout prevent it.</span><br><span class="line">    timeout = self.timeout or 0.5</span><br><span class="line"></span><br><span class="line">    # self.socket appears to lose its blocking status after</span><br><span class="line">    # we fork in the arbiter. Reset it here.</span><br><span class="line">    for s in self.sockets:</span><br><span class="line">        s.setblocking(0)</span><br><span class="line"></span><br><span class="line">    if len(self.sockets) &gt; 1:</span><br><span class="line">        self.run_for_multiple(timeout)</span><br><span class="line">    else:</span><br><span class="line">        self.run_for_one(timeout)</span><br></pre></td></tr></table></figure>
+<p>可以看到，通过对sockets数量的判断，工作者进程决定调用不同的方法：</p>
+<pre><code>self.run_for_multiple(timeout)
+self.run_for_one(timeout)
+</code></pre>
+<p>而追踪代码可以发现，它们都会调用来处理一个个的就绪的socket：</p>
+<pre><code># listener是准备就绪的socket
+self.accept(listener)
+</code></pre>
+<p>那就来看一下这个<code>accept(...)</code>方法。</p>
+<h3 id="accept"><a href="#accept" class="headerlink" title="accept()"></a>accept()</h3><p>方法定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">def accept(self, listener):</span><br><span class="line">    &quot;&quot;&quot;listner -- a socket obj</span><br><span class="line">    &quot;&quot;&quot;</span><br><span class="line">    client, addr = listener.accept()</span><br><span class="line">    # set or clear the blocking I/O flag</span><br><span class="line">    client.setblocking(1)</span><br><span class="line">    util.close_on_exec(client)</span><br><span class="line">    self.handle(listener, client, addr)</span><br></pre></td></tr></table></figure>
+<p>它得到client、addr之后，调用<code>self.handle(...)</code>去处理连接。</p>
+<h3 id="handle-…"><a href="#handle-…" class="headerlink" title="handle(…)"></a>handle(…)</h3><p>定义如下(省略了异常捕获部分)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">def handle(self, listener, client, addr):</span><br><span class="line">    req = None</span><br><span class="line">    try:</span><br><span class="line">        if self.cfg.is_ssl:</span><br><span class="line">            client = ssl.wrap_socket(client, server_side=True,</span><br><span class="line">                **self.cfg.ssl_options)</span><br><span class="line"></span><br><span class="line">        parser = http.RequestParser(self.cfg, client)</span><br><span class="line">        req = six.next(parser)</span><br><span class="line">        # 处理请求</span><br><span class="line">        self.handle_request(listener, req, client, addr)</span><br><span class="line">    except http.errors.NoMoreData as e:</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+<p><code>handle(...)</code>解析出请求对象后，又调用<code>self.handle_request(listener, req, client, addr)</code>去处理请求了。</p>
+<h3 id="handle-request-…"><a href="#handle-request-…" class="headerlink" title="handle_request(…)"></a>handle_request(…)</h3><p>定义如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">def handle_request(self, listener, req, client, addr):</span><br><span class="line">    environ = &#123;&#125;</span><br><span class="line">    resp = None</span><br><span class="line">    try:</span><br><span class="line">        # 钩子函数</span><br><span class="line">        self.cfg.pre_request(self, req)</span><br><span class="line">        request_start = datetime.now()</span><br><span class="line">        resp, environ = wsgi.create(req, client, addr,</span><br><span class="line">                listener.getsockname(), self.cfg)</span><br><span class="line">        # Force the connection closed until someone shows</span><br><span class="line">        # a buffering proxy that supports Keep-Alive to</span><br><span class="line">        # the backend.</span><br><span class="line">        resp.force_close()</span><br><span class="line">        self.nr += 1</span><br><span class="line">        &quot;&quot;&quot;`max_requests` -- The maximum number of requests a worker</span><br><span class="line">                             will process before restarting.</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        if self.nr &gt;= self.max_requests:</span><br><span class="line">            self.log.info(&quot;Autorestarting worker after current request.&quot;)</span><br><span class="line">            self.alive = False</span><br><span class="line">        # 调用web应用对象去处理请求</span><br><span class="line">        respiter = self.wsgi(environ, resp.start_response)</span><br><span class="line">        try:</span><br><span class="line">            # 输出响应</span><br><span class="line">            if isinstance(respiter, environ[&#x27;wsgi.file_wrapper&#x27;]):</span><br><span class="line">                resp.write_file(respiter)</span><br><span class="line">            else:</span><br><span class="line">                for item in respiter:</span><br><span class="line">                    resp.write(item)</span><br><span class="line">            resp.close()</span><br><span class="line">            request_time = datetime.now() - request_start</span><br><span class="line">            self.log.access(resp, req, environ, request_time)</span><br><span class="line">        finally:</span><br><span class="line">            if hasattr(respiter, &quot;close&quot;):</span><br><span class="line">                respiter.close()</span><br><span class="line">    except EnvironmentError:</span><br><span class="line">        # pass to next try-except level</span><br><span class="line">        six.reraise(*sys.exc_info())</span><br><span class="line">    except Exception:</span><br><span class="line">        if resp and resp.headers_sent:</span><br><span class="line">            # If the requests have already been sent, we should close the</span><br><span class="line">            # connection to indicate the error.</span><br><span class="line">            self.log.exception(&quot;Error handling request&quot;)</span><br><span class="line">            try:</span><br><span class="line">                client.shutdown(socket.SHUT_RDWR)</span><br><span class="line">                client.close()</span><br><span class="line">            except EnvironmentError:</span><br><span class="line">                pass</span><br><span class="line">            raise StopIteration()</span><br><span class="line">        raise</span><br><span class="line">    finally:</span><br><span class="line">        try:</span><br><span class="line">            # 钩子函数</span><br><span class="line">            self.cfg.post_request(self, req, environ, resp)</span><br><span class="line">        except Exception:</span><br><span class="line">            self.log.exception(&quot;Exception in post_request hook&quot;)</span><br></pre></td></tr></table></figure>
+<p>注释也比较清楚了，就不解释了。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn%E6%BA%90%E7%A0%81/" rel="tag"># gunicorn源码</a>
+          
+            <a href="/tags/gunicorn/" rel="tag"># gunicorn</a>
+          
+            <a href="/tags/gunicorn%E5%B7%A5%E4%BD%9C%E8%80%85/" rel="tag"># gunicorn工作者</a>
+          
+            <a href="/tags/SyncWorker/" rel="tag"># SyncWorker</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/05/Gunicorn%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E4%B8%8E%E5%88%86%E6%9E%90-%E4%BA%8C-%E2%80%94%E2%80%94gunicorn%E7%9A%84%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86%E4%BB%A5%E5%8F%8A%E5%AF%B9%E5%B7%A5%E4%BD%9C%E8%80%85%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%AE%A1%E7%90%86/" rel="next" title="Gunicorn源码阅读与分析(二)——gunicorn的信号处理以及对工作者进程的管理">
+                <i class="fa fa-chevron-left"></i> Gunicorn源码阅读与分析(二)——gunicorn的信号处理以及对工作者进程的管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/08/RBAC%E7%9A%84%E5%AE%9E%E7%8E%B0%E4%BB%A5%E5%8F%8A%E8%AF%AF%E5%8C%BA/" rel="prev" title="RBAC的实现以及误区">
+                RBAC的实现以及误区 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#run"><span class="nav-number">1.</span> <span class="nav-text">run()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accept"><span class="nav-number">2.</span> <span class="nav-text">accept()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handle-%E2%80%A6"><span class="nav-number">3.</span> <span class="nav-text">handle(…)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#handle-request-%E2%80%A6"><span class="nav-number">4.</span> <span class="nav-text">handle_request(…)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

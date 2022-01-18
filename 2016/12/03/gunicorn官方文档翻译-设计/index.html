@@ -1,0 +1,716 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn官方文档,gunicorn设计," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Design(设计)A brief description of the architecture of Gunicorn. Gunicorn体系的简单介绍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gunicorn官方文档翻译-设计">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Design(设计)A brief description of the architecture of Gunicorn. Gunicorn体系的简单介绍。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:32:44.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.664Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn官方文档">
+<meta property="article:tag" content="gunicorn设计">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/gunicorn官方文档翻译-设计/"/>
+
+
+
+
+
+  <title> gunicorn官方文档翻译-设计 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%AE%BE%E8%AE%A1/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                gunicorn官方文档翻译-设计
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:32:44+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gunicorn/" itemprop="url" rel="index">
+                    <span itemprop="name">gunicorn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Design-设计"><a href="#Design-设计" class="headerlink" title="Design(设计)"></a>Design(设计)</h1><p>A brief description of the architecture of Gunicorn.</p>
+<p>Gunicorn体系的简单介绍。</p>
+<span id="more"></span>
+
+<h3 id="Server-Model-服务器模型"><a href="#Server-Model-服务器模型" class="headerlink" title="Server Model(服务器模型)"></a>Server Model(服务器模型)</h3><p>Gunicorn is based on the pre-fork worker model. This means that there is a central master process that manages a set of worker processes. The master never knows anything about individual clients. All requests and responses are handled completely by worker processes.</p>
+<p>Gunicorn基于<strong>pre-fork（预启）</strong>工作者模型。 即：有一个主进程来管理一组工作者进程。各个客户端对于主进程是透明的。所有的请求和相应是由工作者进程处理的。</p>
+<h3 id="Master-主进程"><a href="#Master-主进程" class="headerlink" title="Master(主进程)"></a>Master(主进程)</h3><p>The master process is a simple loop that listens for various process signals and reacts accordingly. It manages the list of running workers by listening for signals like TTIN, TTOU, and CHLD. TTIN and TTOU tell the master to increase or decrease the number of running workers. CHLD indicates that a child process has terminated, in this case the master process automatically restarts the failed worker.</p>
+<p>主进程是个简单的循环，在循环中监听各种进程信号并响应。它监听像：TTIN、TTOU、CHLD等信号来管理一系列运行的工作者。<strong>TTIN</strong>和<strong>TTOU</strong>通知主进程是增加还是减少工作者的数量。<strong>CHIL</strong>表示一个子进程已经结束了， 主进程要重启一个工作者。</p>
+<h3 id="Sync-Workers-同步工作者"><a href="#Sync-Workers-同步工作者" class="headerlink" title="Sync Workers(同步工作者)"></a>Sync Workers(同步工作者)</h3><p>The most basic and the default worker type is a synchronous worker class that handles a single request at a time. This model is the simplest to reason about as any errors will affect at most a single request. Though as we describe below only processing a single request at a time requires some assumptions about how applications are programmed.</p>
+<p>最基本且默认的工作者类型是同步的工作者类， 一次处理一个请求。 该模型之所以最为简单， 其中一个原因是： 任何错误能够在一个请求中反映出来。</p>
+<h3 id="Async-Workers-异步工作者"><a href="#Async-Workers-异步工作者" class="headerlink" title="Async Workers(异步工作者)"></a>Async Workers(异步工作者)</h3><p>The asynchronous workers available are based on Greenlets (via Eventlet and Gevent). Greenlets are an implementation of cooperative multi-threading for Python. In general, an application should be able to make use of these worker classes with no changes.</p>
+<p>基于Greenlets(或Eventlet、Gevent)， 可以实现异步工作者。Greenlets 是多线程协同的Python实现。一般情况下， 一个应用不要修改这些使用的工作者类。</p>
+<h3 id="Tornado-Workers-Tornado工作者"><a href="#Tornado-Workers-Tornado工作者" class="headerlink" title="Tornado Workers(Tornado工作者)"></a>Tornado Workers(Tornado工作者)</h3><p>There’s also a Tornado worker class. It can be used to write applications using the Tornado framework. Although the Tornado workers are capable of serving a WSGI application, this is not a recommended configuration.</p>
+<p>还有**Tornado **工作者类。可以通过Tornado 框架来编写应用。尽管Tornado工作者能够服务于WSGI应用，但不推荐。</p>
+<h3 id="AsyncIO-Workers-异步IO工作者"><a href="#AsyncIO-Workers-异步IO工作者" class="headerlink" title="AsyncIO Workers(异步IO工作者)"></a>AsyncIO Workers(异步IO工作者)</h3><p>These workers are compatible with python3. You have two kind of workers.</p>
+<p>支持python3.， 分为两种：</p>
+<p>The worker gthread is a threaded worker. It accepts connections in the main loop, accepted connections are added to the thread pool as a connection job. On keepalive connections are put back in the loop waiting for an event. If no event happen after the keep alive timeout, the connection is closed.</p>
+<p>The worker gaiohttp is a full asyncio worker using aiohttp.</p>
+<h3 id="Choosing-a-Worker-Type"><a href="#Choosing-a-Worker-Type" class="headerlink" title="Choosing a Worker Type"></a>Choosing a Worker Type</h3><p>The default synchronous workers assume that your application is resource-bound in terms of CPU and network bandwidth. Generally this means that your application shouldn’t do anything that takes an undefined amount of time. An example of something that takes an undefined amount of time is a request to the internet. At some point the external network will fail in such a way that clients will pile up on your servers. So, in this sense, any web application which makes outgoing requests to APIs will benefit from an asynchronous worker.</p>
+<p>This resource bound assumption is why we require a buffering proxy in front of a default configuration Gunicorn. If you exposed synchronous workers to the internet, a DOS attack would be trivial by creating a load that trickles data to the servers. For the curious, Boom is an example of this type of load.</p>
+<p>Some examples of behavior requiring asynchronous workers:</p>
+<p>Applications making long blocking calls (Ie, external web services) Serving requests directly to the internet Streaming requests and responses Long polling Web sockets Comet</p>
+<h3 id="How-Many-Workers-多少个工作者呢？"><a href="#How-Many-Workers-多少个工作者呢？" class="headerlink" title="How Many Workers? (多少个工作者呢？)"></a>How Many Workers? (多少个工作者呢？)</h3><p>DO NOT scale the number of workers to the number of clients you expect to have. Gunicorn should only need 4-12 worker processes to handle hundreds or thousands of requests per second.</p>
+<p>一定不要把工作者进程的数量放大到你的客户端的数量。Gunicorn只需要4-12个工作者进程就足以每秒处理成百上千的请求。</p>
+<p>Gunicorn relies on the operating system to provide all of the load balancing when handling requests. Generally we recommend (2 x $num_cores) + 1 as the number of workers to start off with. While not overly scientific, the formula is based on the assumption that for a given core, one worker will be reading or writing from the socket while the other worker is processing a request.</p>
+<p>在处理请求时， Gunicorn依赖于操作系统提供负载均衡。一般而言， 我们推荐<strong>2*CPU个数+1</strong>作为工作者的数量。虽然不太科学，公式是基于这样一个假设： 对于给定的一个CPU核，一名工作者对套接字进行读或者写，而另一名工作者正在处理一个请求。</p>
+<p>Obviously, your particular hardware and application are going to affect the optimal number of workers. Our recommendation is to start with the above guess and tune using TTIN and TTOU signals while the application is under load.</p>
+<p>显然， 你的特定硬件和应用会影响工作者的数目。 我们的推荐是，按照上述假设设置工作者数量，并在应用工作时，使用TTIN、TTOU信号调整工作者数量。</p>
+<p>Always remember, there is such a thing as too many workers. After a point your worker processes will start thrashing system resources decreasing the throughput of the entire system.</p>
+<p>切记，工作者数量太多实大忌。 在工作者数量达到一定的临界点后， 他们会浪费系统资源、降低吞吐量。</p>
+<h3 id="How-Many-Threads-多少个线程呢？"><a href="#How-Many-Threads-多少个线程呢？" class="headerlink" title="How Many Threads?(多少个线程呢？)"></a>How Many Threads?(多少个线程呢？)</h3><p>Since Gunicorn 19, a threads option can be used to process requests in multiple threads. Using threads assumes use of the sync worker. One benefit from threads is that requests can take longer than the worker timeout while notifying the master process that it is not frozen and should not be killed. Depending on the system, using multiple threads, multiple worker processes, or some mixture, may yield the best results. For example, CPython may not perform as well as Jython when using threads, as threading is implemented differently by each. Using threads instead of processes is a good way to reduce the memory footprint of Gunicorn, while still allowing for application upgrades using the reload signal, as the application code will be shared among workers but loaded only in the worker processes (unlike when using the preload setting, which loads the code in the master process).</p>
+<p>从版本19开始，添加了threads选项， 允许使用多线程来处理请求。使用线程，就需要使用sync工作者。使用线程的一个好处是，当工作者进程通知主进程，它自己不应该被杀死时， 请求得到处理的时间可以超过工作者进程的超时时间。系统、多线程、多进程、或混合等因素，也许能够带来最好的结果。 例如， 多线程环境下， CPython性能比不上Jython， 因为二者的线程实现不同。相对于多进程， 当允许应用使用重新加载信号升级时，应用会被工作者进程共享，且只加载到工作者进程中，使用线程可以减少Gunicorn对内存的占用。</p>
+<p><strong>Note</strong></p>
+<pre><code>Under Python 2.x, you need to install the ‘futures’ package to use this feature.
+
+在Python2.x中， 你需要安装&#39;future&#39;包以便使用该特性。
+</code></pre>
+<p>(未完待续)</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="tag"># gunicorn官方文档</a>
+          
+            <a href="/tags/gunicorn%E8%AE%BE%E8%AE%A1/" rel="tag"># gunicorn设计</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86/" rel="next" title="gunicorn官方文档翻译-信号处理">
+                <i class="fa fa-chevron-left"></i> gunicorn官方文档翻译-信号处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E9%83%A8%E7%BD%B2%E5%BA%94%E7%94%A8/" rel="prev" title="gunicorn官方文档翻译-部署应用">
+                gunicorn官方文档翻译-部署应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Design-%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.</span> <span class="nav-text">Design(设计)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Server-Model-%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.0.1.</span> <span class="nav-text">Server Model(服务器模型)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Master-%E4%B8%BB%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.0.2.</span> <span class="nav-text">Master(主进程)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sync-Workers-%E5%90%8C%E6%AD%A5%E5%B7%A5%E4%BD%9C%E8%80%85"><span class="nav-number">1.0.3.</span> <span class="nav-text">Sync Workers(同步工作者)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Async-Workers-%E5%BC%82%E6%AD%A5%E5%B7%A5%E4%BD%9C%E8%80%85"><span class="nav-number">1.0.4.</span> <span class="nav-text">Async Workers(异步工作者)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tornado-Workers-Tornado%E5%B7%A5%E4%BD%9C%E8%80%85"><span class="nav-number">1.0.5.</span> <span class="nav-text">Tornado Workers(Tornado工作者)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AsyncIO-Workers-%E5%BC%82%E6%AD%A5IO%E5%B7%A5%E4%BD%9C%E8%80%85"><span class="nav-number">1.0.6.</span> <span class="nav-text">AsyncIO Workers(异步IO工作者)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Choosing-a-Worker-Type"><span class="nav-number">1.0.7.</span> <span class="nav-text">Choosing a Worker Type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#How-Many-Workers-%E5%A4%9A%E5%B0%91%E4%B8%AA%E5%B7%A5%E4%BD%9C%E8%80%85%E5%91%A2%EF%BC%9F"><span class="nav-number">1.0.8.</span> <span class="nav-text">How Many Workers? (多少个工作者呢？)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#How-Many-Threads-%E5%A4%9A%E5%B0%91%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%91%A2%EF%BC%9F"><span class="nav-number">1.0.9.</span> <span class="nav-text">How Many Threads?(多少个线程呢？)</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

@@ -1,0 +1,786 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="blinker,信号,观察者模式," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="观察者模式也被称作发布&#x2F;订阅模式，观察者模式定让多个观察者对象同时监听某一个主题对象。当主题对象在状态发生变化时，会通知所有观察者对象，使它们能够自动更新自己，从而实现了解耦。举个例子：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="观察者模式与blinker信号量">
+<meta property="og:url" content="http://yoursite.com/2016/12/27/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E4%B8%8Eblinker%E4%BF%A1%E5%8F%B7%E9%87%8F/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="观察者模式也被称作发布&#x2F;订阅模式，观察者模式定让多个观察者对象同时监听某一个主题对象。当主题对象在状态发生变化时，会通知所有观察者对象，使它们能够自动更新自己，从而实现了解耦。举个例子：">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-27T00:10:34.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:53.259Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="blinker">
+<meta property="article:tag" content="信号">
+<meta property="article:tag" content="观察者模式">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/27/观察者模式与blinker信号量/"/>
+
+
+
+
+
+  <title> 观察者模式与blinker信号量 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/27/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E4%B8%8Eblinker%E4%BF%A1%E5%8F%B7%E9%87%8F/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                观察者模式与blinker信号量
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-27T08:10:34+08:00">
+                2016-12-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/blinker/" itemprop="url" rel="index">
+                    <span itemprop="name">blinker</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h2><p>也被称作发布/订阅模式，观察者模式定让多个观察者对象同时监听某一个主题对象。当主题对象在状态发生变化时，会通知所有观察者对象，使它们能够自动更新自己，从而实现了解耦。举个例子：</p>
+<span id="more"></span>
+
+<pre><code>办公楼的白领们路过保安室的时候，告知门卫： 如果有人找我的话，这是我的电话，请打我的电话通知我(这时，门卫变成了&quot;主题对象&quot;,白领们变成了&quot;观察者&quot;，完成了&quot;注册&quot;的过程， &quot;拨打电话&quot;变成了注册的函数)。当外面有人要找人时(事件发生)，门卫(&quot;主题对象&quot;)就会通知观察者。
+</code></pre>
+<p> 观察者对象很容易理解， 也容易实现(以Python为例)：</p>
+<p> 先定义一个<code>观察者</code>：</p>
+<pre><code>class Watcher(object):
+    def update(self, *args, **kwds):
+        pass
+        
+</code></pre>
+<p> 再定义一个<code>主题对象</code>：</p>
+<pre><code>class Subject(object):
+    def __init__(self):
+        self.watchers = []
+        
+    def register(self, watcher):
+        &quot;&quot;&quot;注册观察者
+        &quot;&quot;&quot;
+        if watcher is None:
+            raise RuntimeError(&#39;观察者不能是None&#39;)
+        self.watchers.append(watcher)
+        
+    def remove(self, watcher):
+        # 需要保证watcher在self.watchers中
+        self.watchers.remove(watcher)
+        
+    def notice(self):
+        &quot;&quot;&quot;通知观察者
+        &quot;&quot;&quot;
+        for watcher in self.watchers:
+            warcher.update()
+</code></pre>
+<p><code>主题对象</code>通过<code>register(...)</code>来注册<code>观察者</code>对象，并在条件<br>发生时,使用<code>notice(...)</code>通知已经注册的<code>观察者</code>对象。</p>
+<h2 id="blinker"><a href="#blinker" class="headerlink" title="blinker"></a>blinker</h2><p><a target="_blank" rel="noopener" href="http://pythonhosted.org/blinker/">Blinker</a>是Python实现的消息机制，其<br>核心思想也是通过观察者模式实现消息通知，功能也比较丰富， 有下列特性：</p>
+<pre><code>1. 命名信号的全局注册机制
+2. 异步信号
+3. 线程安全
+4. 从观察者中收集返回值
+...
+</code></pre>
+<h3 id="概念介绍"><a href="#概念介绍" class="headerlink" title="概念介绍"></a>概念介绍</h3><p>Blinker中包含了下列概念：</p>
+<pre><code>receiver: 信号的接收者，即&quot;观察者模式&quot;中的观察者, 准确的说，是观察者的update()函数对象
+sender: 信号的发送者(本质上也是信号), 即&quot;观察者模式&quot;中的主题对象
+</code></pre>
+<h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><h4 id="命名信号声明"><a href="#命名信号声明" class="headerlink" title="命名信号声明"></a>命名信号声明</h4><pre><code>&gt;&gt;&gt; from blinker import signal
+&gt;&gt;&gt; initialized = signal(&#39;initialized&#39;)
+&gt;&gt;&gt; initialized is signal(&#39;initialized&#39;)
+True
+</code></pre>
+<h4 id="订阅信号"><a href="#订阅信号" class="headerlink" title="订阅信号"></a>订阅信号</h4><p><code>Signal.connect()</code>用于注册信号发生时的回调函数，</p>
+<pre><code>&gt;&gt;&gt; def subscriber(sender):
+...     print(&quot;Got a signal sent by %r&quot; % sender)
+...
+&gt;&gt;&gt; ready = signal(&#39;ready&#39;)
+&gt;&gt;&gt; ready.connect(subscriber)
+&lt;function subscriber at 0x...&gt;
+</code></pre>
+<h4 id="激发信号"><a href="#激发信号" class="headerlink" title="激发信号"></a>激发信号</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">from blinker import signal</span><br><span class="line"></span><br><span class="line">def subscriber(sender):</span><br><span class="line">    print(&quot;Got a signal sent by %r&quot; % sender)</span><br><span class="line"></span><br><span class="line">ready = signal(&#x27;ready&#x27;)</span><br><span class="line"># 注册</span><br><span class="line">ready.connect(subscriber)</span><br><span class="line"></span><br><span class="line">class Processor:</span><br><span class="line"></span><br><span class="line">    def __init__(self, name):</span><br><span class="line">        self.name = name</span><br><span class="line"></span><br><span class="line">    def go(self):</span><br><span class="line">        ready = signal(&#x27;ready&#x27;)</span><br><span class="line">        # 发送通知</span><br><span class="line">        ready.send(self)</span><br><span class="line">        print(&quot;Ready to Process...&quot;)</span><br><span class="line">        complete = signal(&#x27;complete&#x27;)</span><br><span class="line">        complete.send(self)</span><br><span class="line"></span><br><span class="line">    def __repr__(self):</span><br><span class="line">        return &#x27;&lt;Processor %s&gt;&#x27; % self.name</span><br><span class="line"></span><br><span class="line">Processor_1 = Processor(&#x27;intel core i3&#x27;)</span><br><span class="line">Processor_1.go()</span><br></pre></td></tr></table></figure>
+
+<h4 id="订阅特殊的发送者"><a href="#订阅特殊的发送者" class="headerlink" title="订阅特殊的发送者"></a>订阅特殊的发送者</h4><pre><code>&gt;&gt;&gt; def b_subscriber(sender):
+...     print(&quot;Caught signal from processor_b.&quot;)
+...     assert sender.name == &#39;b&#39;
+...
+&gt;&gt;&gt; processor_b = Processor(&#39;b&#39;)
+&gt;&gt;&gt; ready.connect(b_subscriber, sender=processor_b)
+&lt;function b_subscriber at 0x...&gt;
+</code></pre>
+<h4 id="装饰器和发送数据"><a href="#装饰器和发送数据" class="headerlink" title="装饰器和发送数据"></a>装饰器和发送数据</h4><pre><code>&gt;&gt;&gt; send_data = signal(&#39;send-data&#39;)
+&gt;&gt;&gt; @send_data.connect
+... def receive_data(sender, **kw):
+...     print(&quot;Caught signal from %r, data %r&quot; % (sender, kw))
+...     return &#39;received!&#39;
+...
+&gt;&gt;&gt; result = send_data.send(&#39;anonymous&#39;, abc=123)
+Caught signal from &#39;anonymous&#39;, data &#123;&#39;abc&#39;: 123&#125;
+&gt;&gt;&gt; result
+[(&lt;function receive_data at 0x...&gt;, &#39;received!&#39;)]
+</code></pre>
+<h4 id="匿名信号"><a href="#匿名信号" class="headerlink" title="匿名信号"></a>匿名信号</h4><pre><code>&gt;&gt;&gt; from blinker import Signal
+&gt;&gt;&gt; class AltProcessor:
+...    on_ready = Signal()
+...    on_complete = Signal()
+...
+...    def __init__(self, name):
+...        self.name = name
+...
+...    def go(self):
+...        self.on_ready.send(self)
+...        print(&quot;Alternate processing.&quot;)
+...        self.on_complete.send(self)
+...
+...    def __repr__(self):
+...        return &#39;&lt;AltProcessor %s&gt;&#39; % self.name
+</code></pre>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>blinker的主要内容在<code>base.py</code>文件,包含了<code>Signal</code> 、 <code>NamedSignal</code> 、 <code>Namespace</code> 、 <code>WeekNamespace</code>等几个主要的类。</p>
+<p><code>Signal</code>是最关键的类，表示一个特定的信号，提供了对信号的基本操作方法： connect 、 disconnect 、 send 等。它包含3个主要的概念： <code>sender</code>、 <code>receiver</code>.receiver 通过 hash 方法计算一个 id 作为其在 Signal 中的 key，signal 则是当前的信号对象。它的初始化过程如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">def __init__(self, doc=None):</span><br><span class="line">    ...</span><br><span class="line">    if doc:</span><br><span class="line">        self.__doc__ = doc</span><br><span class="line">    ...</span><br><span class="line">    self.receivers = &#123;&#125;</span><br><span class="line">    self._by_receiver = defaultdict(set)</span><br><span class="line">    self._by_sender = defaultdict(set)</span><br><span class="line">    self._weak_senders = &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p><code>receivers</code>是一个receiver的id和引用（原始对象引用或弱引用 weakref）的字典。<code>_by_receiver</code> 和 <code>_by_sender</code> 用于辅助查找，一个是通过<code>receiver id</code>查找对应的<code>sender id</code>集合，一个是通过<code>sender id</code>查找对应的<code>receiver id</code>集合。</p>
+<p>订阅信号时，使用<code>connect</code>，过程如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">def connect(self, receiver, sender=ANY, weak=True):</span><br><span class="line">    ...</span><br><span class="line">    receiver_id = hashable_identity(receiver)</span><br><span class="line">    if weak:</span><br><span class="line">        receiver_ref = reference(receiver, self._cleanup_receiver)</span><br><span class="line">        receiver_ref.receiver_id = receiver_id</span><br><span class="line">    else:</span><br><span class="line">        receiver_ref = receiver</span><br><span class="line">    if sender is ANY:</span><br><span class="line">        sender_id = ANY_ID</span><br><span class="line">    else:</span><br><span class="line">        sender_id = hashable_identity(sender)</span><br><span class="line"></span><br><span class="line">    self.receivers.setdefault(receiver_id, receiver_ref)</span><br><span class="line">    self._by_sender[sender_id].add(receiver_id)</span><br><span class="line">    self._by_receiver[receiver_id].add(sender_id)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>通过 hash 计算一个 receiver 的 id 作为 key ，并计算 sender 的 id 。然后，将 receiver id 和其引用保存到 <code>receivers</code>字典，sender 与 receiver 的对应关系分别保存到<code>_by_sender</code>和<code>_by_receiver</code>中，供后续查找时使用。</p>
+<p>成功使用 connect 订阅信号后，可以进行信号的发送，代码如下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">def send(self, *sender, **kwargs):</span><br><span class="line">    ...</span><br><span class="line">    if len(sender) == 0:</span><br><span class="line">        sender = None</span><br><span class="line">    elif len(sender) &gt; 1:</span><br><span class="line">        raise TypeError(&#x27;send() accepts only one positional argument, &#x27;</span><br><span class="line">                        &#x27;%s given&#x27; % len(sender))</span><br><span class="line">    else:</span><br><span class="line">        sender = sender[0]</span><br><span class="line">    if not self.receivers:</span><br><span class="line">        return []</span><br><span class="line">    else:</span><br><span class="line">        # 循环发送即可.</span><br><span class="line">        return [(receiver, receiver(sender, **kwargs))</span><br><span class="line">                for receiver in self.receivers_for(sender)]</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/blinker/" rel="tag"># blinker</a>
+          
+            <a href="/tags/%E4%BF%A1%E5%8F%B7/" rel="tag"># 信号</a>
+          
+            <a href="/tags/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F/" rel="tag"># 观察者模式</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/26/werkzeug%E7%9A%84MapAdapter%E5%AE%9E%E7%8E%B0/" rel="next" title="werkzeug的MapAdapter实现">
+                <i class="fa fa-chevron-left"></i> werkzeug的MapAdapter实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/01/04/python2-7%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B%E4%B9%8B%E5%87%BD%E6%95%B0%E5%AF%B9%E8%B1%A1/" rel="prev" title="python2.7数据模型之函数对象">
+                python2.7数据模型之函数对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#blinker"><span class="nav-number">2.</span> <span class="nav-text">blinker</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text">概念介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%91%BD%E5%90%8D%E4%BF%A1%E5%8F%B7%E5%A3%B0%E6%98%8E"><span class="nav-number">2.2.1.</span> <span class="nav-text">命名信号声明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A2%E9%98%85%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.2.2.</span> <span class="nav-text">订阅信号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BF%80%E5%8F%91%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.2.3.</span> <span class="nav-text">激发信号</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A2%E9%98%85%E7%89%B9%E6%AE%8A%E7%9A%84%E5%8F%91%E9%80%81%E8%80%85"><span class="nav-number">2.2.4.</span> <span class="nav-text">订阅特殊的发送者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A3%85%E9%A5%B0%E5%99%A8%E5%92%8C%E5%8F%91%E9%80%81%E6%95%B0%E6%8D%AE"><span class="nav-number">2.2.5.</span> <span class="nav-text">装饰器和发送数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8C%BF%E5%90%8D%E4%BF%A1%E5%8F%B7"><span class="nav-number">2.2.6.</span> <span class="nav-text">匿名信号</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">2.3.</span> <span class="nav-text">实现</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

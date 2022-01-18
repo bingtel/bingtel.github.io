@@ -1,0 +1,714 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="空对象性能," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Python内置数据类型这里的python内置数据类型指的是: 1list, tuple, dict  (由于python只能通过set()创建空集合，本文不比较)。 同时，仅测试了Py3.7.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="创建python空对象方法的性能比较&amp;分析">
+<meta property="og:url" content="http://yoursite.com/2019/10/07/%E5%88%9B%E5%BB%BApython%E7%A9%BA%E5%AF%B9%E8%B1%A1%E6%96%B9%E6%B3%95%E7%9A%84%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83-%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Python内置数据类型这里的python内置数据类型指的是: 1list, tuple, dict  (由于python只能通过set()创建空集合，本文不比较)。 同时，仅测试了Py3.7.">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-10-07T12:39:45.000Z">
+<meta property="article:modified_time" content="2022-01-17T02:58:31.156Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="空对象性能">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/07/创建python空对象方法的性能比较-分析/"/>
+
+
+
+
+
+  <title> 创建python空对象方法的性能比较&分析 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/07/%E5%88%9B%E5%BB%BApython%E7%A9%BA%E5%AF%B9%E8%B1%A1%E6%96%B9%E6%B3%95%E7%9A%84%E6%80%A7%E8%83%BD%E6%AF%94%E8%BE%83-%E5%88%86%E6%9E%90/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                创建python空对象方法的性能比较&分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2019-10-07T20:39:45+08:00">
+                2019-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Python内置数据类型"><a href="#Python内置数据类型" class="headerlink" title="Python内置数据类型"></a>Python内置数据类型</h2><p>这里的python内置数据类型指的是:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">list, tuple, dict</span><br></pre></td></tr></table></figure>
+
+<p>(由于python只能通过<code>set()</code>创建空集合，本文不比较)。</p>
+<p>同时，仅测试了<code>Py3.7</code>.</p>
+<span id="more"></span>
+
+<h2 id="测试方式"><a href="#测试方式" class="headerlink" title="测试方式"></a>测试方式</h2><p>后面执行的语句都不太长，使用<code>timeit.timeit</code>来统计语句的执行时间。</p>
+<p><code>timeit.timeit(stmt=&#39;pass&#39;, setup=&#39;pass&#39;, timer=&lt;default timer&gt;, number=1000000, globals=None)</code>，<code>number</code>表示执行的次数, 结果的单位是<code>秒</code></p>
+<h2 id="list"><a href="#list" class="headerlink" title="list"></a>list</h2><p>创建空列表的方式有:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">a = []</span><br><span class="line">b = list()</span><br></pre></td></tr></table></figure>
+<p>那么，<code>二者等价</code>吗？</p>
+<p>通过下面的例子检验下:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import timit</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; timeit.timeit(&#x27;list()&#x27;, number=10**6)</span><br><span class="line">0.14638996124267578</span><br><span class="line">&gt;&gt;&gt; timeit.timeit(&#x27;[]&#x27;, number=10**6)</span><br><span class="line">0.04969233274459839</span><br></pre></td></tr></table></figure>
+
+
+<p>很明显:</p>
+<blockquote>
+<p>使用[]创建空列表的速度要快于list().</p>
+</blockquote>
+<p><strong>为什么</strong>?</p>
+<p>可以先看看调用<code>[]</code>、<code>list()</code>的时候，都做了哪些。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; import dis</span><br><span class="line"></span><br><span class="line">&gt;&gt;&gt; dis.dis(lambda: [])</span><br><span class="line">  1           0 BUILD_LIST               0</span><br><span class="line">              2 RETURN_VALUE</span><br><span class="line">&gt;&gt;&gt; dis.dis(lambda: list())</span><br><span class="line">  1           0 LOAD_GLOBAL              0 (list)</span><br><span class="line">              2 CALL_FUNCTION            0</span><br><span class="line">              4 RETURN_VALUE</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>, 上述格式指的是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">源码行号 | 指令在函数中的偏移 | 指令符号 | 指令参数 | 实际参数值</span><br></pre></td></tr></table></figure>
+
+<p>看着，调用<code>[]</code>时做得工作，比调用<code>list()</code>时少了一步。</p>
+<p>先来看看<code>BUILD_LIST</code>,</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">switch (opcode) &#123;</span><br><span class="line">    ...</span><br><span class="line">    case TARGET(BUILD_LIST): &#123;</span><br><span class="line">        PyObject *list =  PyList_New(oparg);</span><br><span class="line">        if (list == NULL)</span><br><span class="line">            goto error;</span><br><span class="line">        while (--oparg &gt;= 0) &#123;</span><br><span class="line">            PyObject *item = POP();</span><br><span class="line">            PyList_SET_ITEM(list, oparg, item);</span><br><span class="line">        &#125;</span><br><span class="line">        PUSH(list);</span><br><span class="line">        DISPATCH();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>BUILD_LIST</code>作为一个操作符, 对应的时间只是创建一个空列表。</p>
+<p>而<code>LOAD_GLOBAL</code>用来加载全局变量,包括指定函数名、类名、模块名等symbol,，逻辑也比<code>BUILD_LIST</code>更复杂、效率也低,<a target="_blank" rel="noopener" href="https://github.com/python/cpython/blob/master/Python/ceval.c">查看源码</a>。</p>
+<p>而<code>CALL_FUNCTION</code>实现如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> case TARGET(CALL_FUNCTION): &#123;</span><br><span class="line">    PREDICTED(CALL_FUNCTION);</span><br><span class="line">    PyObject **sp, *res;</span><br><span class="line">    sp = stack_pointer;</span><br><span class="line">    res = call_function(tstate, &amp;sp, oparg, NULL);  # 核心实现</span><br><span class="line">    stack_pointer = sp;</span><br><span class="line">    PUSH(res);</span><br><span class="line">    if (res == NULL) &#123;</span><br><span class="line">        goto error;</span><br><span class="line">    &#125;</span><br><span class="line">    DISPATCH();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>能够看出，<code>LOAD_GLOBAL</code>、<code>CALL_FUNCTION</code>比较耗时。</p>
+<h2 id="dict"><a href="#dict" class="headerlink" title="dict"></a>dict</h2><p>同上。</p>
+<h2 id="tuple"><a href="#tuple" class="headerlink" title="tuple"></a>tuple</h2><p>同上。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>总体而言，通过<code>literal</code>(<code>[]</code>/<code>()</code>/<code>&#123;&#125;</code>)的方式创建空对象，效率要高于<code>list()</code>/<code>tuple()</code>/<code>dict()</code>的方式。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/%E7%A9%BA%E5%AF%B9%E8%B1%A1%E6%80%A7%E8%83%BD/" rel="tag"># 空对象性能</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/07/%E5%90%8E%E7%AB%AF%E5%81%B7%E5%81%B7%E6%87%92-%E8%AE%A9Nginx%E5%81%9A%E5%BE%97%E6%9B%B4%E5%A4%9A/" rel="next" title="后端偷偷懒,让Nginx做得更多">
+                <i class="fa fa-chevron-left"></i> 后端偷偷懒,让Nginx做得更多
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/07/python-web%E9%A1%B9%E7%9B%AE%E5%8F%91%E5%B8%83%E6%96%B9%E5%BC%8F%E6%80%BB%E7%BB%93%E5%92%8C%E6%AF%94%E8%BE%83/" rel="prev" title="python web项目发布方式总结和比较">
+                python web项目发布方式总结和比较 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Python%E5%86%85%E7%BD%AE%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">Python内置数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95%E6%96%B9%E5%BC%8F"><span class="nav-number">2.</span> <span class="nav-text">测试方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#list"><span class="nav-number">3.</span> <span class="nav-text">list</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dict"><span class="nav-number">4.</span> <span class="nav-text">dict</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tuple"><span class="nav-number">5.</span> <span class="nav-text">tuple</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

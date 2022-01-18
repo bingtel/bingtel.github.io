@@ -1,0 +1,732 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="flask,g," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="(本文基于flask&#x3D;&#x3D;0.10.1版本进行编排) 各个request之间, g是独立的么?先说答案： 1是独立的, 每个request到来是，都会有一个新的g产生，只不过保存在app_context里面。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flask之g--变与不变">
+<meta property="og:url" content="http://yoursite.com/2017/11/02/flask%E4%B9%8Bg-%E5%8F%98%E4%B8%8E%E4%B8%8D%E5%8F%98/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="(本文基于flask&#x3D;&#x3D;0.10.1版本进行编排) 各个request之间, g是独立的么?先说答案： 1是独立的, 每个request到来是，都会有一个新的g产生，只不过保存在app_context里面。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-11-01T23:38:13.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.525Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="flask">
+<meta property="article:tag" content="g">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/02/flask之g-变与不变/"/>
+
+
+
+
+
+  <title> flask之g--变与不变 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/02/flask%E4%B9%8Bg-%E5%8F%98%E4%B8%8E%E4%B8%8D%E5%8F%98/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                flask之g--变与不变
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-11-02T07:38:13+08:00">
+                2017-11-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/flask/" itemprop="url" rel="index">
+                    <span itemprop="name">flask</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>(本文基于flask==0.10.1版本进行编排)</p>
+<h3 id="各个request之间-g是独立的么"><a href="#各个request之间-g是独立的么" class="headerlink" title="各个request之间, g是独立的么?"></a>各个request之间, g是独立的么?</h3><p>先说答案：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">是独立的, 每个request到来是，都会有一个新的g产生，只不过保存在app_context里面。</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>根据<a target="_blank" rel="noopener" href="http://flask.pocoo.org/docs/0.12/api/#flask.g">官方文档</a>的描述:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Starting with Flask 0.10 this is stored on the application context and no longer on the request context which means it becomes available if only the application context is bound and not yet a request. This is especially useful when combined with the Faking Resources and Context pattern for testing.</span><br></pre></td></tr></table></figure>
+<p>(之所以把g从request_context迁移到app_context里面，是为了方便非web环境下使用，避免使用request上下文)</p>
+<p>容易让人<strong>误以为</strong>: <code>各个request之间，g不是独立的</code>.</p>
+<p>一种<strong>错误的</strong>验证方法是:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"># -*- utf-8 -*-</span><br><span class="line"></span><br><span class="line">from flask import Flask, g</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    print id(g)</span><br><span class="line">    return &#x27;hello&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>认为<code>id(g)</code>的值没变, 就认为<code>各个request的g是不变的</code>， 后文会说错误原因。</p>
+<p>要想搞懂<code>g到底会不会随着request生而生, 死而死</code>问题，需要先明白:</p>
+<pre><code>flask中的g的角色有哪些?
+</code></pre>
+<h3 id="作为LocalProxy的g"><a href="#作为LocalProxy的g" class="headerlink" title="作为LocalProxy的g"></a>作为LocalProxy的g</h3><p>经常使用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from flask import g</span><br></pre></td></tr></table></figure>
+<p>来获取<code>g</code>对象，这个<code>g</code>对象的定义在<code>flask.globals</code>模块中:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">g = LocalProxy(partial(_lookup_app_object, &#x27;g&#x27;))</span><br></pre></td></tr></table></figure>
+<p>显而易见,　这个<code>g</code>对象是个全局的<code>LocalProxy实例</code>, 所以:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">id(g)的值总是固定的；</span><br><span class="line">除非项目重启，g的内存地址才会改变</span><br></pre></td></tr></table></figure>
+
+<p>这种情况下, <code>g</code>是不变的。</p>
+<p>那为什么说，每个<code>request</code>到来时，总会有一个独立的``g`对象呢?</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">作为LocalProxy对象的g, 会代理一个伴随着request产生而产生、消失而消失的g；后者，是作为作为AppContext实例对象属性的g；</span><br><span class="line">前者是不变的，后者是变的。</span><br></pre></td></tr></table></figure>
+<h3 id="作为AppContext实例对象属性的g"><a href="#作为AppContext实例对象属性的g" class="headerlink" title="作为AppContext实例对象属性的g"></a>作为AppContext实例对象属性的g</h3><p>先看一下<code>flask</code>中，对请求是如何处理的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">def wsgi_app(self, environ, start_response):</span><br><span class="line">    # 创建 新的request_context</span><br><span class="line">    ctx = self.request_context(environ)</span><br><span class="line">    # 同时会创建一个新的app_context, 我们研究该函数</span><br><span class="line">    ctx.push()</span><br><span class="line">    error = None</span><br><span class="line">    try:</span><br><span class="line">        try:</span><br><span class="line">            response = self.full_dispatch_request()</span><br><span class="line">        except Exception as e:</span><br><span class="line">            error = e</span><br><span class="line">            response = self.make_response(self.handle_exception(e))</span><br><span class="line">        return response(environ, start_response)</span><br><span class="line">    finally:</span><br><span class="line">        if self.should_ignore_error(error):</span><br><span class="line">            error = None</span><br><span class="line">        ctx.auto_pop(error)</span><br></pre></td></tr></table></figure>
+
+<p>我们来看一下<code>ctx.push()</code>是如何实现(在<code>flask.ctx</code>模块的<code>RequestContext</code>中定义)的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def push(self):</span><br><span class="line">    top = _request_ctx_stack.top</span><br><span class="line">    if top is not None and top.preserved:</span><br><span class="line">        top.pop(top._preserved_exc)</span><br><span class="line"></span><br><span class="line">    # 新的请求到来时，app_ctx 总是None</span><br><span class="line">    app_ctx = _app_ctx_stack.top</span><br><span class="line">    if app_ctx is None or app_ctx.app != self.app:</span><br><span class="line">        # 所以总会创建一个新的app_context</span><br><span class="line">        app_ctx = self.app.app_context()</span><br><span class="line">        # 把新的app_context push到栈顶</span><br><span class="line">        app_ctx.push()</span><br><span class="line">        self._implicit_app_ctx_stack.append(app_ctx)</span><br><span class="line">    else:</span><br><span class="line">        self._implicit_app_ctx_stack.append(None)</span><br><span class="line"></span><br><span class="line">    if hasattr(sys, &#x27;exc_clear&#x27;):</span><br><span class="line">        sys.exc_clear()</span><br><span class="line"></span><br><span class="line">    _request_ctx_stack.push(self)</span><br><span class="line"></span><br><span class="line">    self.session = self.app.open_session(self.request)</span><br><span class="line">    if self.session is None:</span><br><span class="line">        self.session = self.app.make_null_session()</span><br></pre></td></tr></table></figure>
+<p>我们重点看一下<code>app_context</code>是怎么初始化的:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">app_ctx = self.app.app_context()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在<code>flask.app</code>模块中的<code>Flask</code>类里面：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def app_context(self):</span><br><span class="line">    return AppContext(self)</span><br></pre></td></tr></table></figure>
+
+<p>再在<code>flask.ctx</code>模块里面，看一下<code>AppContext</code>对象的初始化过程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class AppContext(object):</span><br><span class="line">    def __init__(self, app):</span><br><span class="line">        self.app = app</span><br><span class="line">        self.url_adapter = app.create_url_adapter(None)</span><br><span class="line">        # 这个g就是随着request变而变的g</span><br><span class="line">        self.g = app.app_ctx_globals_class()</span><br><span class="line">        self._refcnt = 0</span><br><span class="line">        </span><br><span class="line">    def push(self):</span><br><span class="line">        self._refcnt += 1</span><br><span class="line">        if hasattr(sys, &#x27;exc_clear&#x27;):</span><br><span class="line">            sys.exc_clear()</span><br><span class="line">        _app_ctx_stack.push(self)</span><br><span class="line">        appcontext_pushed.send(self.app)</span><br></pre></td></tr></table></figure>
+
+<p>我们找到了动态的<code>g</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.g = app.app_ctx_globals_class()</span><br></pre></td></tr></table></figure>
+<p>那这个<code>self.g</code>和作为LocalProxy对象的g有什么关系呢? 在看代码:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def _lookup_app_object(name):</span><br><span class="line">    top = _app_ctx_stack.top</span><br><span class="line">    if top is None:</span><br><span class="line">        raise RuntimeError(_app_ctx_err_msg)</span><br><span class="line">    return getattr(top, name)</span><br><span class="line">    </span><br><span class="line">g = LocalProxy(partial(_lookup_app_object, &#x27;g&#x27;))</span><br></pre></td></tr></table></figure>
+
+<p>很明显:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">getattr(top, name)就会从当前栈顶的app_context中找出``g``属性, 而这个g对于每个request而言,就是相互独立的。</span><br></pre></td></tr></table></figure>
+
+<p>代码验证：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># -*- utf-8 -*-</span><br><span class="line"></span><br><span class="line">from flask import Flask, g</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line">@app.route(&#x27;/&#x27;)</span><br><span class="line">def index():</span><br><span class="line">    print hasattr(g, &#x27;name&#x27;)</span><br><span class="line">    setattr(g, &#x27;name&#x27;, &#x27;test&#x27;)</span><br><span class="line">    print hasattr(g, &#x27;name&#x27;)</span><br><span class="line">    return &#x27;hello&#x27;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>使用gunicorn启动, 会发现每次请求输出都是:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">False</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>一个request到来，会创建一个request_context对象；该对象会创建一个新的app_context, 该app_context对象会包含一个新的g对象属性；该g对象属性会被一个全局的g(LocalProxy对象)代理。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/flask/" rel="tag"># flask</a>
+          
+            <a href="/tags/g/" rel="tag"># g</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/21/python%E5%AE%9E%E7%8E%B0%E6%B5%81%E5%BC%8F%E4%B8%8B%E8%BD%BD%E6%96%87%E4%BB%B6/" rel="next" title="python实现流式下载文件">
+                <i class="fa fa-chevron-left"></i> python实现流式下载文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/05/flask%E4%B8%8A%E4%B8%8B%E6%96%87%E5%AF%B9%E8%B1%A1%E6%A2%B3%E7%90%86/" rel="prev" title="flask上下文对象梳理">
+                flask上下文对象梳理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%84%E4%B8%AArequest%E4%B9%8B%E9%97%B4-g%E6%98%AF%E7%8B%AC%E7%AB%8B%E7%9A%84%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">各个request之间, g是独立的么?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E4%B8%BALocalProxy%E7%9A%84g"><span class="nav-number">2.</span> <span class="nav-text">作为LocalProxy的g</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%9C%E4%B8%BAAppContext%E5%AE%9E%E4%BE%8B%E5%AF%B9%E8%B1%A1%E5%B1%9E%E6%80%A7%E7%9A%84g"><span class="nav-number">3.</span> <span class="nav-text">作为AppContext实例对象属性的g</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

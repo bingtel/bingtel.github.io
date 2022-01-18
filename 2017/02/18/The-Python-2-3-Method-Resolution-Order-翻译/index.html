@@ -1,0 +1,860 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C3,MRO," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="由Michele Simionato撰写, 原文 摘要 本文是为了那些想要理解Python 2.3的MRO算法——C3算法的程序员们准备的。尽管不是为了新人准备的，但通过几个例子，本文还是具有教学意义的。我不清楚是否已有和本文相同主题的公开文档，因而，本文应该是有用的。  声明 基于Python2.3的授权许可，我将本文贡献给了Python软件基金会(Python Software Foundat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Python 2.3 Method Resolution Order-翻译">
+<meta property="og:url" content="http://yoursite.com/2017/02/18/The-Python-2-3-Method-Resolution-Order-%E7%BF%BB%E8%AF%91/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="由Michele Simionato撰写, 原文 摘要 本文是为了那些想要理解Python 2.3的MRO算法——C3算法的程序员们准备的。尽管不是为了新人准备的，但通过几个例子，本文还是具有教学意义的。我不清楚是否已有和本文相同主题的公开文档，因而，本文应该是有用的。  声明 基于Python2.3的授权许可，我将本文贡献给了Python软件基金会(Python Software Foundat">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-02-18T12:58:54.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:53.119Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="C3">
+<meta property="article:tag" content="MRO">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/02/18/The-Python-2-3-Method-Resolution-Order-翻译/"/>
+
+
+
+
+
+  <title> The Python 2.3 Method Resolution Order-翻译 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/18/The-Python-2-3-Method-Resolution-Order-%E7%BF%BB%E8%AF%91/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                The Python 2.3 Method Resolution Order-翻译
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-18T20:58:54+08:00">
+                2017-02-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index">
+                    <span itemprop="name">python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>由<code>Michele Simionato</code>撰写, <a target="_blank" rel="noopener" href="https://www.python.org/download/releases/2.3/mro/">原文</a></p>
+<h2 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h2><blockquote>
+<p>本文是为了那些想要理解Python 2.3的MRO算法——C3算法的程序员们准备的。尽管不是为了新人准备的，但通过几个例子，本文还是具有教学意义的。我不清楚是否已有和本文相同主题的公开文档，因而，本文应该是有用的。</p>
+</blockquote>
+<h2 id="声明"><a href="#声明" class="headerlink" title="声明"></a>声明</h2><blockquote>
+<p>基于Python2.3的授权许可，我将本文贡献给了Python软件基金会(Python Software Foundation).按照惯例，我会告知读者，接下来的内容应该是正确的，但我不会担保。使用本文，自担风险。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h2><blockquote>
+<p>(感谢)在Python邮件列表中给与我支持的所有人;(感谢)指出我多处不准确之处并让我增加局部优先排序的Paul Foley;(感谢)David Goodger在reStructuredText格式排版上的帮助;(感谢) David Mertz在编辑方面的帮助；(感谢)Joan G. Stark在绘制pythonic图片方面的帮助;最后，感谢热情将本文添加到Python 2.3官方主页的 Guido van Rossum.</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.                     .-=-.          .--.</span><br><span class="line">          __        .&#x27;     &#x27;.       /  &quot; )</span><br><span class="line">  _     .&#x27;  &#x27;.     /   .-.   \     /  .-&#x27;\</span><br><span class="line"> ( \   / .-.  \   /   /   \   \   /  /    ^</span><br><span class="line">  \ `-` /   \  `-&#x27;   /     \   `-`  /</span><br><span class="line">jgs`-.-`     &#x27;.____.&#x27;       `.____.&#x27;</span><br></pre></td></tr></table></figure>
+
+<h2 id="开篇-The-beginning"><a href="#开篇-The-beginning" class="headerlink" title="开篇(The beginning)"></a>开篇(The beginning)</h2><blockquote>
+<p>那幸运之人，发现事物的起因 (Felix qui potuit rerum cognoscere causas) – 维吉尔(Virgilius)</p>
+</blockquote>
+<p>事情要从Samuele Pedroni发给Python开发邮件列表的一封邮件开始[1]。在他的邮件中，Samuele证明了Python 2.2的方法解析顺序(MRO)是单调的，并建议替换成C3。Guido 认可了他的观点，所以现在Python 2.3使用C3方法解析顺序.C3方式本身和Python不搭嘎，因为它是由从事Dylan的人发明的，并在一篇面向lisp开发者的论文中被阐述过[2]。希望该论文给那些想要理解这个MRO变化的Python使用者(Pythonistas)一次热烈讨论。</p>
+<p>首先， 我要声明，我接下来要说的仅适用于Python 2.2引入的新式类，而旧式类维持原有的方法解析顺序:深度优先、从左到右。所以，并没有破坏使用旧式类的老的代码；尽管在原则上可能会破坏Python 2.2的新式类，但实践中，C3解析顺序不同于Python 2.2解析顺序的地方是很少的，所以并不会像猜测的那样破坏代码。</p>
+<p>所以，</p>
+<blockquote>
+<p>别害怕</p>
+</blockquote>
+<p>此外， 除非你重度使用了多继承并且使用了复杂的层次体系，否则，你不需要理解C3算法，可以直接跳过本文。另一方面，如果你想了解多继承是如何工作的，本文就满足你的需要。本文要说的内容并不像你想象的那么复杂。</p>
+<p>本文从下述定义开始：</p>
+<ol>
+<li>在一个复杂的多继承体系中，给定类C，很难确定哪些方法被重写了，例如：确定类C的祖先顺序。</li>
+<li>类C的祖先列表，包含类C本身，从最近的祖先开始，一直到最远的祖先；成为类C的<code>类优先序列(class precedence list)</code>或者<code>线性化(linearization)</code>。</li>
+<li>方法解析顺序(MRO)是一系列用于构建线性化序列的规则；在Python中，术语”<code>the MRO of C</code>和<code>类C的线性化</code>一个意思。</li>
+<li>例如，在单继承的层次中，如果C是C1的子类、C1是C2的子类，那么C的线性化就是[C, C1, C2];然而，在多继承层次中，构建类的线性化列表就很麻烦，因为构建一个满足<code>局部优先顺序(local precedence ordering)</code>和<code>单调性(monotonicity)</code>的现象化会更困难。</li>
+<li>我会在后文讨论局部优先顺序，但要在这先说下单调性。当满足”如果在C的线性化中，C1在C2之前，那么在C的任意子类的线性化中，C1都在C2之前”时, 一个MRO就是单调性的。</li>
+<li>不是所有的类都会有线性化。在复杂的层次中，存在着一些不可能从一个类派生出一个新的子类使得该子类的序列化满足要求情况。</li>
+</ol>
+<p>这里，我给出这种情形的一个例子，考虑下面的层次：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; O = object</span><br><span class="line">&gt;&gt;&gt; class X(O): pass</span><br><span class="line">&gt;&gt;&gt; class Y(O): pass</span><br><span class="line">&gt;&gt;&gt; class A(X,Y): pass</span><br><span class="line">&gt;&gt;&gt; class B(Y,X): pass</span><br></pre></td></tr></table></figure>
+<p>用继承图表示，如下图(其中O表示object类，而object是所有新式类继承层次的起点)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"> — — — — — —</span><br><span class="line">|           |</span><br><span class="line">|    O      |</span><br><span class="line">|  /   \    |</span><br><span class="line"> - X    Y  /</span><br><span class="line">   |  / | /</span><br><span class="line">   | /  |/</span><br><span class="line">   A    B</span><br><span class="line">   \   /</span><br><span class="line">     ?</span><br></pre></td></tr></table></figure>
+
+<p>在这种场景下，不可能从A、B中派生出一个新的类C，因为：在A的线性化中，X在Y前面；而在B的线性化中，Y在X前面。那么C的方法查找顺序中，就会模棱两可义。</p>
+<p>在这种情形下，Python 2.3会抛出一个异常(<code>TypeError: MRO conflict among bases Y, X</code>)，阻止拿衣服(naive)的Python程序员创建模棱两可的继承层次。Python 2.2不会抛出异常，而是选择了一种特定的方法解析顺序(<code>CABXYO</code>).</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">.   _                   .-=-.          .-==-.</span><br><span class="line">   &#123; &#125;      __        .&#x27; O o &#x27;.       /  -&lt;&#x27; )</span><br><span class="line">   &#123; &#125;    .&#x27; O&#x27;.     / o .-. O \     /  .--v`</span><br><span class="line">   &#123; &#125;   / .-. o\   /O  /   \  o\   /O /</span><br><span class="line">    \ `-` /   \ O`-&#x27;o  /     \  O`-`o /</span><br><span class="line">jgs  `-.-`     &#x27;.____.&#x27;       `.____.&#x27;</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="C3方法解析顺序-The-C3-Method-Resolution-Order"><a href="#C3方法解析顺序-The-C3-Method-Resolution-Order" class="headerlink" title="C3方法解析顺序(The C3 Method Resolution Order)"></a>C3方法解析顺序(The C3 Method Resolution Order)</h2><p>我先引入几个简单的符号以方便后续的讨论。我将使用：</p>
+<blockquote>
+<p>C1 C2 … CN</p>
+</blockquote>
+<p>来代表类列表：<code>[C1, C2, ..., C3]</code></p>
+<p>该列表的<code>head</code>是它的第一个元素：</p>
+<blockquote>
+<p>head = C1</p>
+</blockquote>
+<p>而列表的<code>tail</code>就是列表的余下部分：</p>
+<blockquote>
+<p>tail = C2 … CN.</p>
+</blockquote>
+<p>使用表达式</p>
+<blockquote>
+<p>C + (C1 C2 … CN) = C C1 C2 … CN</p>
+</blockquote>
+<p>来表示多个列表的和： <code>[C] + [C1, C2, ... ,CN]</code></p>
+<p>现在，我可以解释下Python 2.3中MRO是如何工作的了。</p>
+<p>假设在多继承层次中，类C继承自B1，B2，…, BN。 我们想计算类C的线性化L|C|，规则如下：</p>
+<blockquote>
+<p>C的线性化，是类C、C的各个父类线性化的合并、C的父类三个部分的求和(the linearization of C is the sum of C plus the merge of the linearizations of the parents and the list of the parents)</p>
+</blockquote>
+<p>符号化表示：</p>
+<blockquote>
+<p>L[C(B1 … BN)] = C + merge(L[B1] … L[BN], B1 … BN)</p>
+</blockquote>
+<p>特殊情况下， 如果C是<code>object</code>类，线性化就简单：</p>
+<blockquote>
+<p>[object] = object.</p>
+</blockquote>
+<p>通常情况下，需要按照下述方法来进行序列化列表的合并：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">take the head of the first list, i.e L[B1][0]; </span><br><span class="line"></span><br><span class="line">取出第一个列表的head， 比如 L[B1][0]；</span><br><span class="line"></span><br><span class="line">if this head is not in the tail of any of the other lists, </span><br><span class="line"></span><br><span class="line">如果这个head不在其它列表的tail中</span><br><span class="line"></span><br><span class="line">then add it to the linearization of C and remove it from the lists in the merge, </span><br><span class="line"></span><br><span class="line">那就把这个head添加到C的线性化中并从所有的列表中删除它，</span><br><span class="line"></span><br><span class="line">otherwise look at the head of the next list and take it, if it is a good head. </span><br><span class="line"></span><br><span class="line">否则，就查看下一个列表的head， 如果满足上面的条件的h话，就取它。</span><br><span class="line"></span><br><span class="line">Then repeat the operation until all the class are removed or it is impossible to find good heads.</span><br><span class="line"></span><br><span class="line">接着重复操作，直到所有的列表中的所有的类被删除完毕或者不可能再找到一个符合规则的head。</span><br><span class="line"></span><br><span class="line">In this case, it is impossible to construct the merge,</span><br><span class="line"></span><br><span class="line">在这种情况下，不可能构建合并。</span><br><span class="line"></span><br><span class="line">Python 2.3 will refuse to create the class C and will raise an exception.</span><br><span class="line"></span><br><span class="line">Python 2.3会拒绝创建类C并会抛出一个异常。</span><br></pre></td></tr></table></figure>
+
+<p>该方法保证：如果顺序能够被保留，合并操作会保留顺序。反过来说，如果顺序不能被保留，合并操作就不能进行。</p>
+<p>如果类C只有一个父类，很容易合并：</p>
+<blockquote>
+<p>L[C(B)] = C + merge(L[B],B) = C + L[B]</p>
+</blockquote>
+<p>然而，在多继承层次中，处理起来会更复杂。我也不指望你在没几个例子的情况下，能够理解上面的规则。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">.         .-&#x27;-.</span><br><span class="line">        /&#x27;     `\</span><br><span class="line">      /&#x27; _.-.-._ `\</span><br><span class="line">     |  (|)   (|)  |</span><br><span class="line">     |   \__&quot;__/   |</span><br><span class="line">     \    |v.v|    /</span><br><span class="line">      \   | | |   /</span><br><span class="line">       `\ |=^-| /&#x27;</span><br><span class="line">         `|=-=|&#x27;</span><br><span class="line">          | - |</span><br><span class="line">          |=  |</span><br><span class="line">          |-=-|</span><br><span class="line">    _.-=-=|= -|=-=-._</span><br><span class="line">   (      |___|      )</span><br><span class="line">  ( `-=-=-=-=-=-=-=-` )</span><br><span class="line">  (`-=-=-=-=-=-=-=-=-`)</span><br><span class="line">  (`-=-=-=-=-=-=-=-=-`)</span><br><span class="line">   (`-=-=-=-=-=-=-=-`)</span><br><span class="line">    (`-=-=-=-=-=-=-`)</span><br><span class="line">jgs  `-=-=-=-=-=-=-`</span><br></pre></td></tr></table></figure>
+
+<h2 id="例子-Examples"><a href="#例子-Examples" class="headerlink" title="例子(Examples)"></a>例子(Examples)</h2><p>第一个例子，考虑下面的继承层次：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; O = object</span><br><span class="line">&gt;&gt;&gt; class F(O): pass</span><br><span class="line">&gt;&gt;&gt; class E(O): pass</span><br><span class="line">&gt;&gt;&gt; class D(O): pass</span><br><span class="line">&gt;&gt;&gt; class C(D,F): pass</span><br><span class="line">&gt;&gt;&gt; class B(D,E): pass</span><br><span class="line">&gt;&gt;&gt; class A(B,C): pass</span><br></pre></td></tr></table></figure>
+<p>继承图如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.                        6</span><br><span class="line">                         ---</span><br><span class="line">Level 3                 | O |                  (more general)</span><br><span class="line">                      /  ---  \</span><br><span class="line">                     /    |    \                      |</span><br><span class="line">                    /     |     \                     |</span><br><span class="line">                   /      |      \                    |</span><br><span class="line">                  ---    ---    ---                   |</span><br><span class="line">Level 2        3 | D | 4| E |  | F | 5                |</span><br><span class="line">                  ---    ---    ---                   |</span><br><span class="line">                   \  \ _ /       |                   |</span><br><span class="line">                    \    / \ _    |                   |</span><br><span class="line">                     \  /      \  |                   |</span><br><span class="line">                      ---      ---                    |</span><br><span class="line">Level 1            1 | B |    | C | 2                 |</span><br><span class="line">                      ---      ---                    |</span><br><span class="line">                        \      /                      |</span><br><span class="line">                         \    /                      \ /</span><br><span class="line">                           ---</span><br><span class="line">Level 0                 0 | A |                (more specialized)</span><br><span class="line">                           ---</span><br></pre></td></tr></table></figure>
+<p>O、D、E、F的线性化很简单：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">L[O] = O</span><br><span class="line">L[D] = D O</span><br><span class="line">L[E] = E O</span><br><span class="line">L[F] = F O</span><br></pre></td></tr></table></figure>
+
+<p>B的线性化可以如下计算：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">L[B] = B + merge(DO, EO, DE)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，<code>D</code>是个满足规则的head，所以将它取出，就简化为计算<code>merge(O,EO,E)</code>.现在O不符合规则，因为它在<code>EO</code>的tail中。这种情况下，按照规则，我们要跳到下一个序列。接着我们看到，E符合规则；我们采用它， 并简化为计算<code>merge(O,O)</code>，所以：</p>
+<blockquote>
+<p>L[B] =  B D E O</p>
+</blockquote>
+<p>即：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">L[C] = C + merge(DO,FO,DF)</span><br><span class="line">     = C + D + merge(O,FO,F)</span><br><span class="line">     = C + D + F + merge(O,O)</span><br><span class="line">     = C D F O</span><br></pre></td></tr></table></figure>
+
+<p>现在，我们可以计算：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">L[A] = A + merge(BDEO,CDFO,BC)</span><br><span class="line">     = A + B + merge(DEO,CDFO,C)</span><br><span class="line">     = A + B + C + merge(DEO,DFO)</span><br><span class="line">     = A + B + C + D + merge(EO,FO)</span><br><span class="line">     = A + B + C + D + E + merge(O,FO)</span><br><span class="line">     = A + B + C + D + E + F + merge(O,O)</span><br><span class="line">     = A B C D E F O</span><br></pre></td></tr></table></figure>
+<p>在本例中，按照继承层次，线性化比较好地排序了， 有种“底层的父类具有较高的优先级”。但这只是个特例，而非一般情况。</p>
+<p>我将下面的例子留给读者作为练习。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; O = object</span><br><span class="line">&gt;&gt;&gt; class F(O): pass</span><br><span class="line">&gt;&gt;&gt; class E(O): pass</span><br><span class="line">&gt;&gt;&gt; class D(O): pass</span><br><span class="line">&gt;&gt;&gt; class C(D,F): pass</span><br><span class="line">&gt;&gt;&gt; class B(E,D): pass</span><br><span class="line">&gt;&gt;&gt; class A(B,C): pass</span><br></pre></td></tr></table></figure>
+<p>这个例子和前一个例子的唯一区别是<code> B(D,E) --&gt; B(E,D)</code>。但就是这一点小修改会完全改变整个层次的排序。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">.                          6</span><br><span class="line">                          ---</span><br><span class="line">Level 3                  | O |</span><br><span class="line">                       /  ---  \</span><br><span class="line">                      /    |    \</span><br><span class="line">                     /     |     \</span><br><span class="line">                    /      |      \</span><br><span class="line">                  ---     ---    ---</span><br><span class="line">Level 2        2 | E | 4 | D |  | F | 5</span><br><span class="line">                  ---     ---    ---</span><br><span class="line">                   \      / \     /</span><br><span class="line">                    \    /   \   /</span><br><span class="line">                     \  /     \ /</span><br><span class="line">                      ---     ---</span><br><span class="line">Level 1            1 | B |   | C | 3</span><br><span class="line">                      ---     ---</span><br><span class="line">                       \       /</span><br><span class="line">                        \     /</span><br><span class="line">                          ---</span><br><span class="line">Level 0                0 | A |</span><br><span class="line">                          ---</span><br></pre></td></tr></table></figure>
+
+<p>要注意：(在线性化列表中)在level 2上的类E，在类C(尽管在Level 1)的前面。</p>
+<p>偷懒的程序员可以直接从Python 2.2中获得MRO，因为这个例子中，Python 2.2的线性化和Python 2.3的线性化一致。调用类A的<code>.mro()</code>方法就够了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; A.mro()</span><br><span class="line">(&lt;class &#x27;__main__.A&#x27;&gt;, &lt;class &#x27;__main__.B&#x27;&gt;, &lt;class &#x27;__main__.E&#x27;&gt;,</span><br><span class="line">&lt;class &#x27;__main__.C&#x27;&gt;, &lt;class &#x27;__main__.D&#x27;&gt;, &lt;class &#x27;__main__.F&#x27;&gt;,</span><br><span class="line">&lt;type &#x27;object&#x27;&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>最后，再来考虑一下第一部分的例子，带来了严重的顺序不一致问题。这个例子中，能够直接得到O, X, Y, A， B的线性化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">L[O] = 0</span><br><span class="line">L[X] = X O</span><br><span class="line">L[Y] = Y O</span><br><span class="line">L[A] = A X Y O</span><br><span class="line">L[B] = B Y X O</span><br></pre></td></tr></table></figure>
+<p>但是却不可能计算C(A，B)的线性化，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">L[C] = C + merge(AXYO, BYXO, AB)</span><br><span class="line">     = C + A + merge(XYO, BYXO, B)</span><br><span class="line">     = C + A + B + merge(XYO, YXO)</span><br></pre></td></tr></table></figure>
+<p>这时，我们不能合并列表<code>XYO</code>和列表<code>YXO</code>，因为<code>X</code>在<code>YXO </code>的tail中，而<code>Y</code>在<code>XYO</code>的tail中：因此，没有了符合规则的head，C3算法停止。 Python 2.3抛出异常、拒绝创建类C。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> .                    __</span><br><span class="line">    (\   .-.   .-.   /_&quot;)</span><br><span class="line">     \\_//^\\_//^\\_//</span><br><span class="line">jgs   `&quot;`   `&quot;`   `&quot;`</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="不好的方法解析顺序-Bad-Method-Resolution-Orders"><a href="#不好的方法解析顺序-Bad-Method-Resolution-Orders" class="headerlink" title="不好的方法解析顺序(Bad Method Resolution Orders)"></a>不好的方法解析顺序(Bad Method Resolution Orders)</h2><p>当一个MRO不满足局部有限顺序、单调性之类的基本条件时，就认为是bad(翻译成’不好’挺怪)。在本节，我将举例证明旧式类的MRO、Python 2.2新式类的MRO是bad。</p>
+<p>简单起见，先从<code>局部优先顺序</code>开始。看下面的这个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; F=type(&#x27;Food&#x27;,(),&#123;&#x27;remember2buy&#x27;:&#x27;spam&#x27;&#125;)</span><br><span class="line">&gt;&gt;&gt; E=type(&#x27;Eggs&#x27;,(F,),&#123;&#x27;remember2buy&#x27;:&#x27;eggs&#x27;&#125;)</span><br><span class="line">&gt;&gt;&gt; G=type(&#x27;GoodFood&#x27;,(F,E),&#123;&#125;) # under Python 2.3 this is an error!</span><br></pre></td></tr></table></figure>
+<p>对应的继承图是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">.            O</span><br><span class="line">             |</span><br><span class="line">(buy spam)   F</span><br><span class="line">             | \</span><br><span class="line">             | E   (buy eggs)</span><br><span class="line">             | /</span><br><span class="line">             G</span><br><span class="line"></span><br><span class="line">      (buy eggs or spam ?)</span><br></pre></td></tr></table></figure>
+<p>我们可以看到，G继承了F和E、F在E的前面；我们也期望<code>G.remember2buy</code>继承自<code>F.rembermer2buy</code>，而不是<code>E.remember2buy</code>，然而，Python 2.2给出的是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; G.remember2buy</span><br><span class="line">&#x27;eggs&#x27;</span><br></pre></td></tr></table></figure>
+<p>这就破坏了<code>局部优先顺序</code>，因为：局部优先列表的顺序，以G的继承链为例，并没有在Python 2.2的G的线性化中得到保留：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">L[G,P22]= G E F object   # F *follows* E</span><br></pre></td></tr></table></figure>
+
+<p>有人会质疑说：在Python 2.2的线性化中，F之所以在E的后面，是因为F是E的父类，所以不像E那么具体。然后，破坏了局部优先顺序，是非常不直观、有错误倾向的做法。由于不同于旧式类，这种做法就尤其正确：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; class F: remember2buy=&#x27;spam&#x27;</span><br><span class="line">&gt;&gt;&gt; class E(F): remember2buy=&#x27;eggs&#x27;</span><br><span class="line">&gt;&gt;&gt; class G(F,E): pass</span><br><span class="line">&gt;&gt;&gt; G.remember2buy</span><br><span class="line">&#x27;spam&#x27;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，MRO是<code>GFEF</code>, 局部优先顺序得到了保留。</p>
+<p>一般来说，应该避免使用像前面例子的继承层次，因为它没有清晰表达是否重写了E。Python 2.3在创建类G的过程中，通过抛出异常解决了这种二义性，有效地阻止了程序员创建这种模棱两可的层次。之所以能抛出异常，是因为C3算法无法合并：</p>
+<blockquote>
+<p>merge(FO,EFO,FE)</p>
+</blockquote>
+<p>因为F在EFO的tai中、E又在FE的tail中。</p>
+<p>真正的解决方案是创建一个无歧义的继承层次，比如让G继承E、F而不是F、E，此时， MRO无疑是GEF，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.          O</span><br><span class="line">           |</span><br><span class="line">           F (spam)</span><br><span class="line">         / |</span><br><span class="line">(eggs)   E |</span><br><span class="line">         \ |</span><br><span class="line">           G</span><br><span class="line">             (eggs, no doubt)</span><br></pre></td></tr></table></figure>
+
+<p>Pytho 2.3强迫程序员书写正确的继承层次(至少没有错误倾向的层次)。</p>
+<p>同样， 我要指出：Python 2.3的C3算法能够智能地识别出多种错误，如，父类列表中存在重复，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; class A(object): pass</span><br><span class="line">&gt;&gt;&gt; class C(A,A): pass # error</span><br><span class="line">Traceback (most recent call last):</span><br><span class="line">  File &quot;&lt;stdin&gt;&quot;, line 1, in ?</span><br><span class="line">TypeError: duplicate base class A</span><br></pre></td></tr></table></figure>
+<p>(然而)在Python 2.2(无论是旧式类还是新式类)都不会抛出任何异常。</p>
+<p>最后，我要总结下从这个例子中学到的两点：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 尽管名称是``method``， MRO还决定了属性的解析顺序，不仅仅是方法</span><br><span class="line">2. Python开发者默认的食物就是spam(尽管你已经知道了).</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.                     __</span><br><span class="line">    (\   .-.   .-.   /_&quot;)</span><br><span class="line">     \\_//^\\_//^\\_//</span><br><span class="line">jgs   `&quot;`   `&quot;`   `&quot;`</span><br></pre></td></tr></table></figure>
+
+<p>已经讨论过局部优先顺序了，接下来介绍一下单调性。我要说的是：无论是旧式类的MRO，还是Python2.2新式类的MRO，都不是单调的。</p>
+<p>很容易证明，旧式类的MRO不是单调的，看下面的菱形图就知道：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">.  C</span><br><span class="line">  / \</span><br><span class="line"> /   \</span><br><span class="line">A     B</span><br><span class="line"> \   /</span><br><span class="line">  \ /</span><br><span class="line">   D</span><br></pre></td></tr></table></figure>
+
+<p>很容易就看出不一致的地方：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">L[B,P21] = B C        # B precedes C : B&#x27;s methods win</span><br><span class="line">L[D,P21] = D A C B C  # B follows C  : C&#x27;s methods win!</span><br></pre></td></tr></table></figure>
+<p>而Python 2.2和Python 2.3给出了相同的答案：</p>
+<blockquote>
+<p>L[D] = D A B C</p>
+</blockquote>
+<p>Guido指出在他自己的文章[3]中，旧式类的MRO在实践中没那么糟糕，因为开发者可以避免这种菱形的继承；但是所有的新式类都继承自object，所以在多继承层次图中，菱形是不可避免的。</p>
+<p>在Python 2.2中，虽然MRO很难破坏单调性，但不是不可能的。下面的例子就是由<code>Samuele Pedroni</code>提供的， 表明Python 2.2的MRO不是单调的，</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; class A(object): pass</span><br><span class="line">&gt;&gt;&gt; class B(object): pass</span><br><span class="line">&gt;&gt;&gt; class C(object): pass</span><br><span class="line">&gt;&gt;&gt; class D(object): pass</span><br><span class="line">&gt;&gt;&gt; class E(object): pass</span><br><span class="line">&gt;&gt;&gt; class K1(A,B,C): pass</span><br><span class="line">&gt;&gt;&gt; class K2(D,B,E): pass</span><br><span class="line">&gt;&gt;&gt; class K3(D,A):   pass</span><br><span class="line">&gt;&gt;&gt; class Z(K1,K2,K3): pass</span><br></pre></td></tr></table></figure>
+<p>按照C3的MRO如下（读者应该自行验证一下线性化、画一画继承图）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">L[A] = A O</span><br><span class="line">L[B] = B O</span><br><span class="line">L[C] = C O</span><br><span class="line">L[D] = D O</span><br><span class="line">L[E] = E O</span><br><span class="line">L[K1]= K1 A B C O</span><br><span class="line">L[K2]= K2 D B E O</span><br><span class="line">L[K3]= K3 D A O</span><br><span class="line">L[Z] = Z K1 K2 K3 D A B C E O</span><br></pre></td></tr></table></figure>
+<p>Python 2.2能够准确给出<code>A, B, C, D, E, K1, K2, K3</code>这些类的线性化， 但是Z的就不对了：</p>
+<blockquote>
+<p>L[Z,P22] = Z K1 K3 A K2 D B C E O</p>
+</blockquote>
+<p>显然，这个线性化是错误的，因为A排在了D前面，但是在K3的线性化中，A是在D后面的。换言之，K3从D继承的方法会覆盖掉A的方法，但是在作为K3子类的类Z中，继承自A的方法覆盖了D的方法；这就违反了单调性。此外，Python2.2中，Z的线性化还违背了局部优先顺序，因为Z的局部优先列表是[K1, K2, K3] (K2在K3前)，但是Z的线性化中，K2在K3后面了。这些问题，解释了为啥2.2的规则违反了C3的规则。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.                                                        __</span><br><span class="line">   (\   .-.   .-.   .-.   .-.   .-.   .-.   .-.   .-.   /_&quot;)</span><br><span class="line">    \\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//</span><br><span class="line">jgs  `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="结束语-The-end"><a href="#结束语-The-end" class="headerlink" title="结束语(The end)"></a>结束语(The end)</h2><p>本节是给那些没有耐心、跳过前几节、直接来到本节的的读者准备的。本节也是给那些不想锻炼一下脑子、偷懒的程序员准备的。最后，本节是给那些傲慢的程序员准备的，不然， 他也不应该正在阅读一篇关于C3 MRO 的文章了;-)。集齐这三个美德可以召唤一个奖品了：一个简短的Python 2.2脚本，帮你计算Python 2.3的MRO，而不用费脑子；只要更改最后一行，就可以好好测试一下我在本文中提到的几个例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line">#&lt;mro.py&gt;</span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;C3 algorithm by Samuele Pedroni (with readability enhanced by me).&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">class __metaclass__(type):</span><br><span class="line">    &quot;All classes are metamagically modified to be nicely printed&quot;</span><br><span class="line">    __repr__ = lambda cls: cls.__name__</span><br><span class="line"></span><br><span class="line">class ex_2:</span><br><span class="line">    &quot;Serious order disagreement&quot; #From Guido</span><br><span class="line">    class O: pass</span><br><span class="line">    class X(O): pass</span><br><span class="line">    class Y(O): pass</span><br><span class="line">    class A(X,Y): pass</span><br><span class="line">    class B(Y,X): pass</span><br><span class="line">    try:</span><br><span class="line">        class Z(A,B): pass #creates Z(A,B) in Python 2.2</span><br><span class="line">    except TypeError:</span><br><span class="line">        pass # Z(A,B) cannot be created in Python 2.3</span><br><span class="line"></span><br><span class="line">class ex_5:</span><br><span class="line">    &quot;My first example&quot;</span><br><span class="line">    class O: pass</span><br><span class="line">    class F(O): pass</span><br><span class="line">    class E(O): pass</span><br><span class="line">    class D(O): pass</span><br><span class="line">    class C(D,F): pass</span><br><span class="line">    class B(D,E): pass</span><br><span class="line">    class A(B,C): pass</span><br><span class="line"></span><br><span class="line">class ex_6:</span><br><span class="line">    &quot;My second example&quot;</span><br><span class="line">    class O: pass</span><br><span class="line">    class F(O): pass</span><br><span class="line">    class E(O): pass</span><br><span class="line">    class D(O): pass</span><br><span class="line">    class C(D,F): pass</span><br><span class="line">    class B(E,D): pass</span><br><span class="line">    class A(B,C): pass</span><br><span class="line"></span><br><span class="line">class ex_9:</span><br><span class="line">    &quot;Difference between Python 2.2 MRO and C3&quot; #From Samuele</span><br><span class="line">    class O: pass</span><br><span class="line">    class A(O): pass</span><br><span class="line">    class B(O): pass</span><br><span class="line">    class C(O): pass</span><br><span class="line">    class D(O): pass</span><br><span class="line">    class E(O): pass</span><br><span class="line">    class K1(A,B,C): pass</span><br><span class="line">    class K2(D,B,E): pass</span><br><span class="line">    class K3(D,A): pass</span><br><span class="line">    class Z(K1,K2,K3): pass</span><br><span class="line"></span><br><span class="line">def merge(seqs):</span><br><span class="line">    print &#x27;\n\nCPL[%s]=%s&#x27; % (seqs[0][0],seqs),</span><br><span class="line">    res = []; i=0</span><br><span class="line">    while 1:</span><br><span class="line">      nonemptyseqs=[seq for seq in seqs if seq]</span><br><span class="line">      if not nonemptyseqs: return res</span><br><span class="line">      i+=1; print &#x27;\n&#x27;,i,&#x27;round: candidates...&#x27;,</span><br><span class="line">      for seq in nonemptyseqs: # find merge candidates among seq heads</span><br><span class="line">          cand = seq[0]; print &#x27; &#x27;,cand,</span><br><span class="line">          nothead=[s for s in nonemptyseqs if cand in s[1:]]</span><br><span class="line">          if nothead: cand=None #reject candidate</span><br><span class="line">          else: break</span><br><span class="line">      if not cand: raise &quot;Inconsistent hierarchy&quot;</span><br><span class="line">      res.append(cand)</span><br><span class="line">      for seq in nonemptyseqs: # remove cand</span><br><span class="line">          if seq[0] == cand: del seq[0]</span><br><span class="line"></span><br><span class="line">def mro(C):</span><br><span class="line">    &quot;Compute the class precedence list (mro) according to C3&quot;</span><br><span class="line">    return merge([[C]]+map(mro,C.__bases__)+[list(C.__bases__)])</span><br><span class="line"></span><br><span class="line">def print_mro(C):</span><br><span class="line">    print &#x27;\nMRO[%s]=%s&#x27; % (C,mro(C))</span><br><span class="line">    print &#x27;\nP22 MRO[%s]=%s&#x27; % (C,C.mro())</span><br><span class="line"></span><br><span class="line">print_mro(ex_9.Z)</span><br><span class="line"></span><br><span class="line">#&lt;/mro.py&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">.   __</span><br><span class="line">   (&quot;_\   .-.   .-.   .-.   .-.   .-.   .-.   .-.   .-.   /)</span><br><span class="line">      \\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//^\\_//</span><br><span class="line">jgs    `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`   `&quot;`</span><br></pre></td></tr></table></figure>
+<h2 id="资源-Resources"><a href="#资源-Resources" class="headerlink" title="资源(Resources)"></a>资源(Resources)</h2><p>[1]    The thread on python-dev started by Samuele Pedroni: <a target="_blank" rel="noopener" href="http://mail.python.org/pipermail/python-dev/2002-October/029035.html">http://mail.python.org/pipermail/python-dev/2002-October/029035.html</a></p>
+<p>[2]    The paper A Monotonic Superclass Linearization for Dylan: <a target="_blank" rel="noopener" href="http://www.webcom.com/haahr/dylan/linearization-oopsla96.html">http://www.webcom.com/haahr/dylan/linearization-oopsla96.html</a></p>
+<p>[3]    Guido van Rossum’s essay, Unifying types and classes in Python 2.2: <a target="_blank" rel="noopener" href="http://www.python.org/2.2.2/descrintro.html">http://www.python.org/2.2.2/descrintro.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C3/" rel="tag"># C3</a>
+          
+            <a href="/tags/MRO/" rel="tag"># MRO</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/09/hare-orm%E7%9A%84%E8%AE%BE%E8%AE%A1/" rel="next" title="hare orm的设计">
+                <i class="fa fa-chevron-left"></i> hare orm的设计
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/02/19/leetcode-166-Fraction-to-Recurring-Decimal/" rel="prev" title="leetcode-166-Fraction to Recurring Decimal">
+                leetcode-166-Fraction to Recurring Decimal <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%91%98%E8%A6%81"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%87%B4%E8%B0%A2"><span class="nav-number">3.</span> <span class="nav-text">致谢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E7%AF%87-The-beginning"><span class="nav-number">4.</span> <span class="nav-text">开篇(The beginning)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C3%E6%96%B9%E6%B3%95%E8%A7%A3%E6%9E%90%E9%A1%BA%E5%BA%8F-The-C3-Method-Resolution-Order"><span class="nav-number">5.</span> <span class="nav-text">C3方法解析顺序(The C3 Method Resolution Order)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-Examples"><span class="nav-number">6.</span> <span class="nav-text">例子(Examples)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%A5%BD%E7%9A%84%E6%96%B9%E6%B3%95%E8%A7%A3%E6%9E%90%E9%A1%BA%E5%BA%8F-Bad-Method-Resolution-Orders"><span class="nav-number">7.</span> <span class="nav-text">不好的方法解析顺序(Bad Method Resolution Orders)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9D%9F%E8%AF%AD-The-end"><span class="nav-number">8.</span> <span class="nav-text">结束语(The end)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B5%84%E6%BA%90-Resources"><span class="nav-number">9.</span> <span class="nav-text">资源(Resources)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

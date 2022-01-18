@@ -1,0 +1,742 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="gunicorn官方文档,gunicorn配置," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Configuration Overview(配置概览)Gunicorn pulls configuration information from three distinct places. Gunicorn从3个不同的位置来获取配置信息。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gunicorn官方文档翻译-配置概览">
+<meta property="og:url" content="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E9%85%8D%E7%BD%AE%E6%A6%82%E8%A7%88/index.html">
+<meta property="og:site_name" content="bingtel">
+<meta property="og:description" content="Configuration Overview(配置概览)Gunicorn pulls configuration information from three distinct places. Gunicorn从3个不同的位置来获取配置信息。">
+<meta property="og:locale">
+<meta property="article:published_time" content="2016-12-03T13:16:34.000Z">
+<meta property="article:modified_time" content="2022-01-16T11:54:52.692Z">
+<meta property="article:author" content="Wang Yibing">
+<meta property="article:tag" content="gunicorn官方文档">
+<meta property="article:tag" content="gunicorn配置">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/03/gunicorn官方文档翻译-配置概览/"/>
+
+
+
+
+
+  <title> gunicorn官方文档翻译-配置概览 | bingtel </title>
+<meta name="generator" content="Hexo 6.0.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">bingtel</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">木犹如此</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+<div style='display:none;'>
+<script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1257109371'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s11.cnzz.com/z_stat.php%3Fid%3D1257109371' type='text/javascript'%3E%3C/script%3E"));</script>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?728a3326befbc818061494f87805db56";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</div>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E9%85%8D%E7%BD%AE%E6%A6%82%E8%A7%88/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.gif">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="bingtel">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="bingtel" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                gunicorn官方文档翻译-配置概览
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-03T21:16:34+08:00">
+                2016-12-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/gunicorn/" itemprop="url" rel="index">
+                    <span itemprop="name">gunicorn</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Configuration-Overview-配置概览"><a href="#Configuration-Overview-配置概览" class="headerlink" title="Configuration Overview(配置概览)"></a>Configuration Overview(配置概览)</h1><p>Gunicorn pulls configuration information from three distinct places.</p>
+<p>Gunicorn从3个不同的位置来获取配置信息。</p>
+<span id="more"></span>
+
+<p>The first place that Gunicorn will read configuration from is the framework specific configuration file. Currently this only affects Paster applications.</p>
+<p>Gunicorn获取配置信息的第一个地方是框架特定的配置文件， 目前只有Paster应用支持。</p>
+<p>The second source of configuration information is a configuration file that is optionally specified on the command line. Anything specified in the Gunicorn config file will override any framework specific settings.</p>
+<p>第二个地方是命令行中指明的配置文件。配置文件中的参数会覆盖框架中的特定配置。</p>
+<p>Lastly, the command line arguments used to invoke Gunicorn are the final place considered for configuration settings. If an option is specified on the command line, this is the value that will be used.</p>
+<p>最后的是Gunicorn命令行中指定的参数值， 该值是最终使用的指。</p>
+<p>Once again, in order of least to most authoritative:</p>
+<p>再次提醒， 重要性从低到高排序：</p>
+<ul>
+<li>  Framework Settings(框架配置)</li>
+<li>  Configuration File(配置文件)</li>
+<li>  Command Line(命令行参数)</li>
+</ul>
+<h3 id="Note"><a href="#Note" class="headerlink" title="Note"></a>Note</h3><pre><code>To check your configuration when using the command line or the configuration file you can run the following command:
+
+为了检查配置文件或者命令行是否正确， 可以用下列命令：
+
+$ gunicorn --check-config APP_MODULE
+
+It also allows you to know if your application can be launched.
+
+该命令也可以探测应用是否启动了。
+</code></pre>
+<h1 id="Command-Line"><a href="#Command-Line" class="headerlink" title="Command Line"></a>Command Line</h1><p>If an option is specified on the command line, it overrides all other values that may have been specified in the app specific settings, or in the optional configuration file. Not all Gunicorn settings are available to be set from the command line. To see the full list of command line settings you can do the usual:</p>
+<pre><code>如果命令行中指定了一个选项， 那该选项会覆盖掉配置文件、框架中该参数的值。
+
+但是， 并非所有的Gunicorn配置都能够使用命令行来设置。 你可以使用下述命令来查看所有的参数项：
+
+$ gunicorn -h
+
+There is also a --version flag available to the command line scripts that isn’t mentioned in the list of settings.
+
+**--version**参数却不在  * gunicorn -h *的输出结果中。
+</code></pre>
+<h1 id="Configuration-File-配置文件"><a href="#Configuration-File-配置文件" class="headerlink" title="Configuration File(配置文件)"></a>Configuration File(配置文件)</h1><p>The configuration file should be a valid Python source file. It only needs to be readable from the file system. More specifically, it does not need to be importable. Any Python is valid. Just consider that this will be run every time you start Gunicorn (including when you signal Gunicorn to reload).</p>
+<p>配置文件必须是有效的Python源文件， 只需要是可读权限即可。它不需要是可导入的， 只要是有效的Python文件即可。每次启动Gunicorn的时候， 它都会被运行。</p>
+<p>To set a parameter, just assign to it. There’s no special syntax. The values you provide will be used for the configuration values.</p>
+<p>想要设置一个参数， 只要赋值给它即可。 没有特殊的语法。</p>
+<p>For instance:</p>
+<p>例如：</p>
+<pre><code>import multiprocessing
+
+bind = &quot;127.0.0.1:8000&quot;
+workers = multiprocessing.cpu_count() * 2 + 1
+</code></pre>
+<p>All the settings are mentioned in the settings list.</p>
+<p>所有的参数配置都会在<a target="_blank" rel="noopener" href="http://docs.gunicorn.org/en/latest/settings.html#settings">settings</a>中说明。</p>
+<h1 id="Framework-Settings"><a href="#Framework-Settings" class="headerlink" title="Framework Settings"></a>Framework Settings</h1><p>Currently, only Paster applications have access to framework specific settings. If you have ideas for providing settings to WSGI applications or pulling information from Django’s settings.py feel free to open an issue to let us know.</p>
+<p>当前， 只有Paster应用有权限访问框架的特定配置。如果你有方法配置WSGI应用或者获取Django的配置文件， 请告知我们。</p>
+<h3 id="Paster-Applications"><a href="#Paster-Applications" class="headerlink" title="Paster Applications"></a>Paster Applications</h3><p>In your INI file, you can specify to use Gunicorn as the server like such:</p>
+<p>在你的INI文件中， 你可以按照下面的配置指定使用Gunicorn作为服务器，</p>
+<pre><code>[server:main]
+use = egg:gunicorn#main
+host = 192.168.0.1
+port = 80
+workers = 2
+proc_name = brim
+</code></pre>
+<p>Any parameters that Gunicorn knows about will automatically be inserted into the base configuration. Remember that these will be overridden by the config file and/or the command line.</p>
+<p>Gunicorn所知的任何参数都会自动插入到这个基本配置中。记住， 这些参数会被配置文件、命令行参数覆盖。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3/" rel="tag"># gunicorn官方文档</a>
+          
+            <a href="/tags/gunicorn%E9%85%8D%E7%BD%AE/" rel="tag"># gunicorn配置</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E8%BF%90%E8%A1%8C/" rel="next" title="gunicorn官方文档翻译-运行">
+                <i class="fa fa-chevron-left"></i> gunicorn官方文档翻译-运行
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/03/gunicorn%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91-%E5%AE%89%E8%A3%85/" rel="prev" title="gunicorn官方文档翻译-安装">
+                gunicorn官方文档翻译-安装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">103</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">139</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Configuration-Overview-%E9%85%8D%E7%BD%AE%E6%A6%82%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text">Configuration Overview(配置概览)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Note"><span class="nav-number">1.0.1.</span> <span class="nav-text">Note</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Command-Line"><span class="nav-number">2.</span> <span class="nav-text">Command Line</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Configuration-File-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">Configuration File(配置文件)</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Framework-Settings"><span class="nav-number">4.</span> <span class="nav-text">Framework Settings</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Paster-Applications"><span class="nav-number">4.0.1.</span> <span class="nav-text">Paster Applications</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Wang Yibing</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" target="_blank" rel="noopener" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
